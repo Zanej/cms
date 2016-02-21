@@ -1,4 +1,5 @@
 <?php
+namespace CMS\DbWorkers;
 /**
  * Ultimate MySQL Wrapper Class
  *
@@ -691,12 +692,13 @@ class MySQL
 		$this->ResetError();
 		if (empty($table)) {
 			$columnCount = $this->mysql_link->num_fields($this->last_result);
+            //echo $columnCount;
 			if (! $columnCount) {
 				$this->SetError();
 				$columns = false;
 			} else {
 				for ($column = 0; $column < $columnCount; $column++) {
-               $infos = $this->last_result->fetch_field_direct($column);
+                    $infos = $this->last_result->fetch_field_direct($column);
 					$columns[] = $infos->name;
 				}
 			}
@@ -1056,10 +1058,10 @@ class MySQL
 
 		// Open persistent or normal connection
 		if ($pcon) {
-			$this->mysql_link = new mysqli(
+			$this->mysql_link = new \mysqli(
 				"p:".$this->db_host, $this->db_user, $this->db_pass,$this->db_dbname);
 		} else {
-			$this->mysql_link = new mysqli(
+			$this->mysql_link = new \mysqli(
 				$this->db_host, $this->db_user, $this->db_pass,$this->db_dbname);
 		}
 		// Connect to mysql server failed?
@@ -1179,7 +1181,7 @@ class MySQL
 		$this->Query($sql);
       //echo $sql;
 		if ($this->RowCount() > 0) {
-			return $this->RowArray(null, $resultType);
+			return $this->RowArray(0, $resultType);
 		} else {
 			return false;
 		}
@@ -1195,7 +1197,7 @@ class MySQL
 	public function QuerySingleValue($sql) {
 		$this->Query($sql);
 		if ($this->RowCount() > 0 && $this->GetColumnCount() > 0) {
-			$row = $this->RowArray(null, MYSQL_NUM);
+			$row = $this->RowArray(0, MYSQL_NUM);
 			return $row[0];
 		} else {
 			return false;

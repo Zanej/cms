@@ -1,4 +1,5 @@
 <?php
+    namespace CMS\DbWorkers;
 	require_once($_SERVER["DOCUMENT_ROOT"]."/include/inc_config.php");
 	class Table{
 		private $fields;

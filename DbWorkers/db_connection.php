@@ -1,5 +1,5 @@
 <?php
-
+namespace CMS\DbWorkers;
 error_reporting(E_ERROR);
 
 if(!isset($_FILES)) $_FILES = $HTTP_POST_FILES;

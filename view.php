@@ -1,6 +1,14 @@
 <?php
-   require_once($_SERVER["DOCUMENT_ROOT"]."/dbworkers/Table.class.php");
-   global $db;
+   namespace CMS\View;
+   use CMS\Config;
+   require_once($_SERVER["DOCUMENT_ROOT"]."/Config/Config.php");
+   
+   //use CMS\DbWorkers\Table;
+   //require_once($_SERVER["DOCUMENT_ROOT"]."/dbworkers/Table.class.php");
+   //global $db;
+   //$table = new Table("ciao");
+   $conf = new Config();
+   $conf->dataBundle();
    /*$field = array(
        "nome"=>"VARCHAR|255",
        "cognome"=>"VARCHAR|255",
@@ -8,9 +16,9 @@
    );
    $table = new Table("Utenti", true, false, $field);
    */
-   $table = new Table("Utenti");
-   $table->insert(array("nome"=>"asd","cognome"=>"asd","codice_fiscale"=>"asdasdasd"));
-   $table->updateKey(23,array("nome"=>"Dennis","cognome"=>"Zanetti","codice_fiscale"=>"Z23G64"));
+   //$table = new Table("Utenti");
+   //$table->insert(array("nome"=>"asd","cognome"=>"asd","codice_fiscale"=>"asdasdasd"));
+   //$table->updateKey(23,array("nome"=>"Dennis","cognome"=>"Zanetti","codice_fiscale"=>"Z23G64"));
   // $db_elem = new DbElement(null,,"id_utente","utenti");
   //echo json_encode($db_elem->getResult());
-   echo $db->Error();
+   //echo $db->Error();

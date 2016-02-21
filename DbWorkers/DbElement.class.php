@@ -1,4 +1,5 @@
 <?php
+    namespace CMS\DbWorkers;
 	/** 
 	 * Interfaccia per gestire un elemento generico del db
 	 */
