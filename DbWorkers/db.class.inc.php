@@ -547,7 +547,7 @@ class MySQL
 		if (empty($table)) {
 			if ($this->RowCount() > 0) {
 				if (is_numeric($column)) {
-					return $this_>mysqli_field_type($this->last_result, $column);
+					return $this->mysqli_field_type($this->last_result, $column);
 				} else {
 					return $this->mysqli_field_type($this->last_result, $this->GetColumnID($column));
 				}
@@ -557,7 +557,7 @@ class MySQL
 		} else {
 			if (is_numeric($column)) $column = $this->GetColumnName($column, $table);
 			$result = $this->mysql_link->query("SELECT " . $column . " FROM " . $table . " LIMIT 1");
-			if ($this->mysql_link->num_fields($result) > 0) {
+			if ($this->mysql_link->field_count($result) > 0) {
 				return $this->mysqli_field_type($result, 0);
 			} else {
 				$this->SetError("The specified column or table does not exist, or no data was returned", -1);
@@ -565,7 +565,63 @@ class MySQL
 			}
 		}
 	}
-
+    /**
+     * Returns the real type of a column in a table
+     * @param $column Column
+     * @param $table Table
+     */
+    public function GetColumnType($column,$table){
+        $res = $this->QuerySingleRowArray("SHOW COLUMNS FROM $table WHERE Field='$column'");
+        return $res["Type"];
+    }
+    /**
+     * Returns whether a column is a key
+     * @param $column Column
+     * @param $table Table
+     */
+    public function IsColumnKey($column,$table){
+        $res = $this->QueryArray("SHOW KEYS FROM $table WHERE Column_name='$column'",MYSQL_ASSOC);
+        //print_r($res);
+        if(count($res) > 0){
+            $ret = "";
+            foreach($res as $key => $val){
+                echo $val["Key_name"];
+                $ret.=$val["Key_name"].",";
+            }
+            $ret = substr($ret,0,strlen($ret)-1);
+            return $ret;
+        }
+        return false;
+    }
+    /**
+     * Returns whether a column can be null
+     * @param type $column
+     * @param type $table
+     * @return boolean
+     */
+    public function IsNullableColumn($column,$table){
+        $res = $this->QuerySingleRowArray("SHOW COLUMNS FROM $table WHERE Field='$column'");
+        return $res["Null"];
+    }
+    /**
+     * Returns default value of a column
+     * @param $column Column
+     * @param $table Table
+     */
+    public function GetDefaultValue($column,$table){
+        $res = $this->QuerySingleRowArray("SHOW COLUMNS FROM $table WHERE Field='$column'");
+        return $res["Default"];
+    }
+    /**
+     * Return extras of a column
+     * @param $column Column
+     * @param $table Table
+     * @return string
+     */
+    public function GetColumnExtras($column,$table){
+        $res = $this->QuerySingleRowArray("SHOW COLUMNS FROM $table WHERE Field='$column'");
+        return $res["Extra"];
+    }
 	/**
 	 * This function returns the position of a column
 	 *

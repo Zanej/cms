@@ -74,15 +74,17 @@
 		 */
 		function __construct($id=null,$params="*",$key_name=null,$table_name=null,$md5=false){
 			global $db;
-         $this->querybuilder = new QueryBuilder();
+            $this->querybuilder = new QueryBuilder();
 			$this->return = array();
 			if (!is_null($key_name)) {
-            $this->key = $key_name;
-         }
-         if(!is_null($table_name)){
-            $this->table = $table_name;
-         }
+                $this->key = $key_name;
+            }
+            if(!is_null($table_name)){
+               $this->table = $table_name;
+            }
 			$this->return["success"]=false;
+            $db = new MySQL(true, "test", "localhost", "root", "");
+            //$db = new MySQL(true,DB_HOST,DB_NAME,DB_PASSWORD,DB_USER);
 			if($db->Error()){
 				$this->return["message"] = "Errore";
 			}
@@ -166,19 +168,23 @@
 		function updateParams($id=null,$params="*",$md5=false){
 			global $db;
 			$id_query = $id == null ? $this->getId() : $id;
-         if(is_array($params)){
-            $search = implode(",",$params);
-            $params = $search;
-         }
-         $sql = "SELECT $params FROM ".$this->table." WHERE ";
-         if($md5){
-            $sql.= " md5(".$this->key.") = '".$id_query."'";
-         }else{
-            $sql.= $this->key." = '".$id_query."'";
-         }
-			$result = $db->QuerySingleRowArray($sql,MYSQL_ASSOC);
-			$this->params = $result;
-		}
+            if(is_array($params)){
+               $search = implode(",",$params);
+               $params = $search;
+            }
+            $sql = "SELECT $params FROM ".$this->table." WHERE ";
+            if($md5){
+               $sql.= " md5(".$this->key.") = '".$id_query."'";
+            }else{
+               $sql.= $this->key." = '".$id_query."'";
+            }
+            //echo $sql;
+            $result = $db->QuerySingleRowArray($sql,MYSQL_ASSOC);
+            $this->params = $result;
+            foreach($result as $key => $val){
+                $this->$key = $val;
+            }
+        }
 		/**
 		 * @see Element
 		 */

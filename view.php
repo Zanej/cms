@@ -1,14 +1,19 @@
 <?php
    namespace CMS\View;
    use CMS\Config;
+   use CMS\Data\Utenti;
+   use CMS\DbWorkers\Table;
    require_once($_SERVER["DOCUMENT_ROOT"]."/Config/Config.php");
-   
-   //use CMS\DbWorkers\Table;
-   //require_once($_SERVER["DOCUMENT_ROOT"]."/dbworkers/Table.class.php");
-   //global $db;
-   //$table = new Table("ciao");
    $conf = new Config();
-   $conf->dataBundle();
+   require_once($_SERVER["DOCUMENT_ROOT"]."/Data/Utenti.php");
+   require_once($_SERVER["DOCUMENT_ROOT"]."/DbWorkers/Table.class.php");
+   
+   //$x = new Utenti();
+   
+   //$conf->dataBundle();
+   //use CMS\DbWorkers\Table;
+   //global $db;
+   $table = new Table("Utenti");
    /*$field = array(
        "nome"=>"VARCHAR|255",
        "cognome"=>"VARCHAR|255",

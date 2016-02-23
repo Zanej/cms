@@ -49,6 +49,12 @@
         }
         /**
          * 
+         */
+        public function getDB(){
+            return $this->db;
+        }
+        /**
+         * 
          * @throws \Exception
          */
         public function dataBundle(){
@@ -61,35 +67,50 @@
             }
             $dir = $_SERVER["DOCUMENT_ROOT"]."\Data";
             foreach($tables as $key => $table){
-                $filename = $dir."\\".ucfirst($table).".php";
                 //if(!file_exists($filename)){
-                    $fop = fopen($filename,"w");
-                    if(!$fop){
-                        throw new \Exception("Errorr");
-                    }
-                    $columnnames = $this->db->GetColumnNames($table);
-                    $spaces= "    ";
-                    fwrite($fop,"<?php\n".$spaces."class ".ucfirst($table)." extends DbElement{\n");
-                    foreach($columnnames as $chiave => $column){
-                        fwrite($fop,$spaces.$spaces."private $".$column.";\n");
-                    }
-                    foreach($columnnames as $chiave => $column){
-                        fwrite($fop,$spaces.$spaces."public function set".ucfirst($column)."($".$column."){\n");
-                        fwrite($fop,$spaces.$spaces.$spaces."\$this->".$column."=$".$column.";\n");
-                        fwrite($fop,$spaces.$spaces."}\n");
-                    }
-                    foreach($columnnames as $chiave => $column){
-                        fwrite($fop,$spaces.$spaces."public function get".ucfirst($column)."(){\n");
-                        fwrite($fop,$spaces.$spaces.$spaces."return \$this->".$column.";\n");
-                        fwrite($fop,$spaces.$spaces."}\n");
-                    }
-                    /*foreach($columnnames as $chiave => $column){
-                        fwrite($fop,$spaces.$spaces."private ".$column);
-                    }*/
-                    fwrite($fop,"\n} ?>");
+                    $this->designDbClass($table);
                 //}
-                
             }
+        }
+        /**
+         * Designs the php class of a table
+         * @param $table table name
+         */
+        private function designDbClass($table){
+            $filename = $_SERVER["DOCUMENT_ROOT"]."\Data\\".ucfirst($table).".php";
+            $fop = fopen($filename,"w");
+            if(!$fop){
+                throw new \Exception("Errorr");
+            }
+            $columnnames = $this->db->GetColumnNames($table);
+            $spaces= "    ";
+            fwrite($fop,"<?php\n".$spaces."namespace CMS\Data;\n");
+            fwrite($fop,$spaces."use CMS\DbWorkers\DbElement; \n");
+            fwrite($fop,$spaces."require_once(\$_SERVER[\"DOCUMENT_ROOT\"].\"\DbWorkers\DbElement.class.php\");\n");
+            fwrite($fop,$spaces."class ".ucfirst($table)." extends DbElement{\n");
+            foreach($columnnames as $chiave => $column){
+                fwrite($fop,$spaces.$spaces."/**\n");
+                fwrite($fop,$spaces.$spaces." *@var ".$this->db->getColumnType($column,$table)."\n");
+                if(($key = $this->db->IsColumnKey($column,$table))){
+                    fwrite($fop,$spaces.$spaces." *@key ".$key."\n");
+                }
+                fwrite($fop,$spaces.$spaces." *@default ".$this->db->GetDefaultValue($column,$table)."\n");
+                fwrite($fop,$spaces.$spaces." *@extra ".$this->db->GetColumnExtras($column,$table)."\n");
+                fwrite($fop,$spaces.$spaces." *@nullable ".$this->db->IsNullableColumn($column,$table)."\n");
+                fwrite($fop,$spaces.$spaces." */\n");
+                fwrite($fop,$spaces.$spaces."protected $".$column.";\n");
+            }
+            foreach($columnnames as $chiave => $column){
+                fwrite($fop,$spaces.$spaces."public function set".ucfirst($column)."($".$column."){\n");
+                fwrite($fop,$spaces.$spaces.$spaces."\$this->".$column."=$".$column.";\n");
+                fwrite($fop,$spaces.$spaces."}\n");
+            }
+            foreach($columnnames as $chiave => $column){
+                fwrite($fop,$spaces.$spaces."public function get".ucfirst($column)."(){\n");
+                fwrite($fop,$spaces.$spaces.$spaces."return \$this->".$column.";\n");
+                fwrite($fop,$spaces.$spaces."}\n");
+            }
+            fwrite($fop,"\n} ?>");
         }
     }
 	
