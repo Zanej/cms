@@ -1,5 +1,4 @@
 <?php
-    namespace CMS\DbWorkers;
 	/** 
 	 * Interfaccia per gestire un elemento generico del db
 	 */
@@ -12,7 +11,7 @@
 		 * @param table_name nome della tabella su cui lavorare
 		 * @param md5 indica se l'elemento passato per la select è md5
 		 */
-		function __construct($id=null,$params="*",$key_name=null,$table_name=null,$md5=false);
+		function __construct($id=null,$params=null,$key_name=null,$table_name=null,$md5=false);
 		/**
 		 * Funzione che inserisce l'elemento nel db
 		 */
@@ -28,7 +27,7 @@
 		/**
 		 * Aggiorna i parametri dopo la creazione o la modifica nel database
 		 */
-		function updateParams($id=null,$params="*",$md5=false);
+		function updateParams($id=null,$params="all",$md5=false);
 		/**
 		 * Ritorna il risultato delle operazioni (success,error,message)
 		 */
@@ -68,63 +67,65 @@
 		protected $return;
 		protected $table;
 		protected $key;
-      private $querybuilder;
 		/**
 		 * @see Element
 		 */
-		function __construct($id=null,$params="*",$key_name=null,$table_name=null,$md5=false){
+		function __construct($id=null,$params=null,$key_name=null,$table_name=null,$md5=false){
 			global $db;
-            $this->querybuilder = new QueryBuilder();
 			$this->return = array();
-			if (!is_null($key_name)) {
-                $this->key = $key_name;
-            }
-            if(!is_null($table_name)){
-               $this->table = $table_name;
-            }
+			if(!is_null($key_name))
+				$this->key = $key_name;
+			if(!is_null($table_name))
+				$this->table = $table_name;
+			$this->return["error"]=true;
 			$this->return["success"]=false;
-            $db = new MySQL(true, "test", "localhost", "root", "");
-            //$db = new MySQL(true,DB_HOST,DB_NAME,DB_PASSWORD,DB_USER);
 			if($db->Error()){
+				//echo $db->ErrorNumber();
 				$this->return["message"] = "Errore";
 			}
-			if($id==null && $params!="*"){
+			//print_r($db);
+			//else{
+			if($id==null){
 				$this->create($params);
 			}
 			else{
 				$this->updateParams($id,$params,$md5);
+				//$this->return["params"]=$this->params;
 			}
+			//}	
 		}
 		/**
 		 * @see Element
 		 */
 		function create($params){
 			global $db;
-         
-			/*$query="INSERT INTO ".$this->table." (";
-         $names.=implode(",",array_keys($params));
-         $values="'";
-         $values.=implode("','",$params);
-         $values.="'";
-			$query.=$names.") VALUES (".$values.")";
+			//print_r($params);
+			$keys = array_keys($params);
+			//print_r($keys);
+			//echo $this->table;
+			$query="INSERT INTO ".$this->table." (";
+			foreach($keys as $key){
+				$query.=$key.",";
+			}
+			$query = substr($query,0,-1);
+			$query.=") VALUES (";
+			foreach($params as $param){
+				$query.="'".$param."',";
+			}
+			$query = substr($query,0,-1).")";
+			//echo $query;
+			//echo $query;
+			
 			$db->Query($query);
 			if($db->Error()){
 				$this->return["message"] = "Non sono riuscito ad aggiungere l'elemento";
 			} else {
 				$this->return["success"] = true;
+				$this->return["error"] = false;
 				$this->return["message"] = "Elemento aggiunto";
 				$id = $db->GetLastInsertID();
 				$this->updateParams($id);
-			}*/
-         $do = $this->querybuilder->insert($this->table, $params);
-         if($id = $do->getResult()){
-            $this->return["success"] = true;
-				$this->return["message"] = "Elemento aggiunto";
-				//$id = $db->GetLastInsertID();
-				$this->updateParams($id);
-         }else{
-            $this->return["message"] ="Non sono riuscito ad aggiungere l'elemento".$db->Error();
-         }
+			}
 		}
 		/**
 		 * @see Element
@@ -146,11 +147,13 @@
 			}
 			$query = substr($query,0,-1);
 			$query.=" WHERE ".$this->key."='".$this->getId()."'";
+			//echo $query;
 			$db->Query($query);
 			if($db->Error()){
 				$this->return["message"]="Errore nella modifica dei dati";
 			} else {
 				$this->return["success"] = true;
+				$this->return["error"] = false;
 				$this->return["message"]="Modifiche effettuate";
 			}
 			$this->updateParams();
@@ -165,26 +168,29 @@
 		/**
 		 * @see Element
 		 */
-		function updateParams($id=null,$params="*",$md5=false){
+		function updateParams($id=null,$params="all",$md5=false){
 			global $db;
 			$id_query = $id == null ? $this->getId() : $id;
-            if(is_array($params)){
-               $search = implode(",",$params);
-               $params = $search;
-            }
-            $sql = "SELECT $params FROM ".$this->table." WHERE ";
-            if($md5){
-               $sql.= " md5(".$this->key.") = '".$id_query."'";
-            }else{
-               $sql.= $this->key." = '".$id_query."'";
-            }
-            //echo $sql;
-            $result = $db->QuerySingleRowArray($sql,MYSQL_ASSOC);
-            $this->params = $result;
-            foreach($result as $key => $val){
-                $this->$key = $val;
-            }
-        }
+			if($params == "all"){
+				if(!$md5)
+					$sql = "SELECT * FROM ".$this->table." WHERE ".$this->key."='".$id_query."'";
+				else
+					$sql = "SELECT * FROM ".$this->table." WHERE md5(".$this->key.")='".$id_query."'";
+			}else{
+				$sql = "SELECT ";
+				foreach($params as $key => $val){
+					$sql.= $val;
+				}
+				$sql.=" FROM ".$this->table." WHERE ";
+				if($md5){
+					$sql.= " md5(".$this->key.") = '".$id_query."'";
+				}else{
+					$sql.= $this->key." = '".$id_query."'";
+				}
+			}
+			$result = $db->QuerySingleRowArray($sql,MYSQL_ASSOC);
+			$this->params = $result;
+		}
 		/**
 		 * @see Element
 		 */
@@ -201,22 +207,21 @@
 		 * @see Element
 		 */
 		function setElem($name,$value){
-			if (isset($this->params[$name])) {
-            $this->update(array($name => $value));
-         }
-         return $this->return;
+			if(isset($this->params[$name]))
+				$this->update(array($name => $value));
+			return $this->return;
 		}
 		/**
 		 * @see Element
 		 */
 		function get($name){
 			if(isset($this->params[$name])){
-				if (!is_numeric($this->params[$name])) {
-               return utf8_decode($this->params[$name]);
-            }
-         return $this->params[$name];
+				if(!is_numeric($this->params[$name]))
+					return utf8_decode($this->params[$name]);
+				return $this->params[$name];
 			}
-			return false;
+			else
+				return false;
 		}
 		/**
 		 * @see Element
@@ -258,10 +263,9 @@
 		 */
 		function areParamsEqual($params){
 			foreach($params as $key=>$value){
-				if (!$this->isEqual($key, $value)) {
-               return false;
-            }
-      }
+				if(!$this->isEqual($key,$value))
+					return false;
+			}
 			return true;
 		}
 	}
