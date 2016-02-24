@@ -1,15 +1,13 @@
 <?php
     namespace CMS\DbWorkers;
-    use CMS\Data\Utenti;
-	//require_once($_SERVER["DOCUMENT_ROOT"]."/include/inc_config.php");
-    global $conf;
-    $db = $conf->getDB();
+    use \CMS\Conf\Config;
 	class Table{
         private $fields;
         private $rows;
         private $key;
         private $name;
         private $return;
+        private $db;
         /**
          * 
          * @param type $name
@@ -40,7 +38,6 @@
          * @param type $values
          */
         public static function create($name,$values){
-            global $db;
             $query = "CREATE TABLE $name (";
             $query.="id INTEGER AUTO_INCREMENT PRIMARY KEY ,";
             foreach($values as $key => $val){
@@ -51,7 +48,7 @@
             $query =substr($query,0,strlen($query)-1);
             $query.=")";
             //echo $query;
-            if($db->Query($query)){
+            if(Config::getDb()->Query($query)){
                 echo json_encode(array("success"=>true));
             }
         }
@@ -60,9 +57,8 @@
          * @param type $table_name Nome della tabella
          */
         public static function exists($table_name){
-           global $db;
-           $db->Query("SELECT * FROM $table_name LIMIT 1");
-           return !$db->Error();
+           Config::getDb()->Query("SELECT * FROM $table_name LIMIT 1");
+           return !Config::getDb()->Error();
         }
         /**
          * 
@@ -97,9 +93,8 @@
          * @param type $join
          */
         private function setRows($what="*",$where="1=1",$join=""){
-            global $db;
             if($what == "*" && $where == "1=1" && $join==""){
-                $arr = $db->QueryArray("SELECT * FROM ".$this->name,MYSQLI_ASSOC);
+                $arr = Config::getDb()->QueryArray("SELECT * FROM ".$this->name,MYSQLI_ASSOC);
                 print_r($arr);
                 foreach($arr as $key => $val){
                     $classname= "CMS\Data\\".$this->name;
@@ -111,8 +106,7 @@
          * 
          */
         private function getKey(){
-           global $db;
-           $arr = $db->QuerySingleRow("SHOW KEYS FROM ".$this->name." WHERE Key_name='PRIMARY'");
+           $arr = Config::getDb()->QuerySingleRow("SHOW KEYS FROM ".$this->name." WHERE Key_name='PRIMARY'");
            return $arr->Column_name;
            //echo $db->Error();
         }

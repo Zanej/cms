@@ -1,7 +1,6 @@
 <?php
     namespace CMS\Data;
     use CMS\DbWorkers\DbElement; 
-    require_once($_SERVER["DOCUMENT_ROOT"]."\DbWorkers\DbElement.class.php");
     class Utenti extends DbElement{
         /**
          *@var int(11)
