@@ -4,16 +4,10 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/Data/Utenti.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/Init/routing.prop</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/Conf/Rewrite.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/DbElement.php</file>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/View.php</file>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/Conf/Config.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/QueryBuilder.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/Init/resources.prop</file>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/Table.php</file>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/MySQL.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/db_connection.php</file>
         </group>
     </open-files>
 </project-private>

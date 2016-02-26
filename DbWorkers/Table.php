@@ -94,7 +94,6 @@
         private function setRows($what="*",$where="1=1",$join=""){
             if($what == "*" && $where == "1=1" && $join==""){
                 $arr = Config::getDb()->QueryArray("SELECT * FROM ".$this->name,MYSQLI_ASSOC);
-                print_r($arr);
                 foreach($arr as $key => $val){
                     $classname= "CMS\Data\\".$this->name;
                     $this->rows[$val[$this->key]] = new $classname($val[$this->key],"*",$this->key,strtolower($this->name));
@@ -102,12 +101,22 @@
             }
         }
         /**
-         * 
+         * Returns the primary key
          */
         private function getKey(){
-           $arr = Config::getDb()->QuerySingleRow("SHOW KEYS FROM ".$this->name." WHERE Key_name='PRIMARY'");
-           return $arr->Column_name;
-           //echo $db->Error();
+            return Config::getDb()->getPrimaryKey($this->name);
+        }
+        /**
+         * Returns all the foreign keys of this table
+         */
+        private function getForeignKeys(){
+            return Config::getDb()->getForeignKeys($this->name);
+        }
+        /**
+         * Returns all keys of this table
+         */
+        private function getAllKeys(){
+            return Config::getDb()->getAllKeys($this->name);
         }
 	}
 ?>

@@ -72,6 +72,8 @@
             if(!$fop){
                 throw new \Exception("Errorr");
             }
+            /* @var self::$db MySQL*/
+            $keys = self::$db->getAllKeys($table);
             $columnnames = self::$db->GetColumnNames($table);
             $spaces= "    ";
             fwrite($fop,"<?php\n".$spaces."namespace CMS\Data;\n");
@@ -80,8 +82,8 @@
             foreach($columnnames as $chiave => $column){
                 fwrite($fop,$spaces.$spaces."/**\n");
                 fwrite($fop,$spaces.$spaces." *@var ".self::$db->getColumnType($column,$table)."\n");
-                if(($key = self::$db->IsColumnKey($column,$table))){
-                    fwrite($fop,$spaces.$spaces." *@key ".$key."\n");
+                if(isset($keys[$column])){
+                    fwrite($fop,$spaces.$spaces." *@key ".$keys[$column]["key_name"]."|".$keys[$column]["key_type"]."\n");
                 }
                 fwrite($fop,$spaces.$spaces." *@default ".self::$db->GetDefaultValue($column,$table)."\n");
                 fwrite($fop,$spaces.$spaces." *@extra ".self::$db->GetColumnExtras($column,$table)."\n");
@@ -91,12 +93,12 @@
             }
             foreach($columnnames as $chiave => $column){
                 fwrite($fop,$spaces.$spaces."public function set".ucfirst($column)."($".$column."){\n");
-                fwrite($fop,$spaces.$spaces.$spaces."\self::".$column."=$".$column.";\n");
+                fwrite($fop,$spaces.$spaces.$spaces."\$this->".$column."=$".$column.";\n");
                 fwrite($fop,$spaces.$spaces."}\n");
             }
             foreach($columnnames as $chiave => $column){
                 fwrite($fop,$spaces.$spaces."public function get".ucfirst($column)."(){\n");
-                fwrite($fop,$spaces.$spaces.$spaces."return \self::".$column.";\n");
+                fwrite($fop,$spaces.$spaces.$spaces."return \$this->".$column.";\n");
                 fwrite($fop,$spaces.$spaces."}\n");
             }
             fwrite($fop,"\n} ?>");

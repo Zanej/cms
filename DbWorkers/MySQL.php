@@ -363,7 +363,30 @@ class MySQL
 			}
 		}
 	}
-
+    /**
+     * Returns all the foreign keys in a table
+     * @param type $table_name Table name
+     * @return type
+     */
+    public function getForeignKeys($table_name){
+        $sql = "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME";
+        $sql.=",REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
+        $sql.=" WHERE TABLE_SCHEMA = '".$this->db_dbname."' AND ";
+        $sql.=" TABLE_NAME='$table_name' and REFERENCED_TABLE_NAME IS NOT NULL";
+        return $this->QueryArray($sql);
+    }
+    /**
+     * Returns the primary key of a table
+     * @param type $table_name
+     */
+    public function getPrimaryKey($table_name){
+        $sql = "SHOW KEYS FROM $table_name WHERE Key_name = (";
+        $sql.= "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS";
+        $sql.= " WHERE CONSTRAINT_SCHEMA = '".$this->db_dbname."' AND table_name='$table_name'";
+        $sql.=" AND constraint_type='primary key' )";
+        $arr = $this->QuerySingleRowArray($sql);
+        return $arr["Column_name"];
+    }
 	/**
 	 * Returns true if the internal pointer is at the end of the records
 	 *
@@ -575,23 +598,54 @@ class MySQL
         return $res["Type"];
     }
     /**
-     * Returns whether a column is a key
+     * Returns if a column is referenced by another
+     */
+    public function isReferencedColumn($column,$table){
+        $sql = "SELECT TABLE_NAME,COLUMN_NAME ";
+        $sql.= " FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
+        $sql.=" WHERE TABLE_SCHEMA = '".$this->db_dbname."' AND ";
+        $sql.=" REFERENCED_TABLE_NAME='$table' AND REFERENCED_COLUMN_NAME='$column'";
+        return $this->QuerySingleRowArray($sql, MYSQL_ASSOC);
+    }
+    /**
+     * Returns references table and columns of a foreign key
      * @param $column Column
      * @param $table Table
      */
-    public function IsColumnKey($column,$table){
-        $res = $this->QueryArray("SHOW KEYS FROM $table WHERE Column_name='$column'",MYSQL_ASSOC);
-        //print_r($res);
-        if(count($res) > 0){
-            $ret = "";
-            foreach($res as $key => $val){
-                echo $val["Key_name"];
-                $ret.=$val["Key_name"].",";
+    public function getForeignKeyReference($column,$table){
+        $sql = "SELECT REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME ";
+        $sql.= " FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
+        $sql.=" WHERE TABLE_SCHEMA = '".$this->db_dbname."' AND ";
+        $sql.=" TABLE_NAME='$table' AND COLUMN_NAME='$column' AND ";
+        $sql.=" REFERENCED_TABLE_NAME IS NOT NULL";
+        return $this->QuerySingleRowArray($sql,MYSQL_ASSOC);
+    }
+    /**
+     * Returns all keys of a table
+     * @param $table table name
+     */
+    public function getAllKeys($table){
+        $sql="SELECT CONSTRAINT_NAME,CONSTRAINT_TYPE FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS";
+        $sql.=" WHERE CONSTRAINT_SCHEMA = '".$this->db_dbname."' AND table_name='$table'";
+        //echo $sql;
+        $arr = $this->QueryArray($sql,MYSQL_ASSOC);
+        foreach($arr as $key => $val){
+            $sql="SHOW KEYS FROM $table WHERE Key_name='".$val["CONSTRAINT_NAME"]."'";
+            $chiave = $this->QuerySingleRowArray($sql,MYSQL_ASSOC);
+            $val["key_name"] = $val["CONSTRAINT_NAME"];
+            
+            if($val["CONSTRAINT_TYPE"] == "FOREIGN KEY"){
+                $infos = $this->getForeignKeyReference($chiave["Column_name"], $table);
+                $val["CONSTRAINT_TYPE"].="|".$infos["REFERENCED_TABLE_NAME"]."|".$infos["REFERENCED_COLUMN_NAME"];
             }
-            $ret = substr($ret,0,strlen($ret)-1);
-            return $ret;
+            $val["key_type"] = $val["CONSTRAINT_TYPE"];
+            unset($val["CONSTRAINT_NAME"]);
+            unset($val["CONSTRAINT_TYPE"]);
+            $arr[$chiave["Column_name"]] = $val;
+            unset($arr[$key]);
         }
-        return false;
+        //print_r($arr);
+        return $arr;
     }
     /**
      * Returns whether a column can be null

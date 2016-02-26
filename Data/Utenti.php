@@ -4,7 +4,7 @@
     class Utenti extends DbElement{
         /**
          *@var int(11)
-         *@key PRIMARY
+         *@key PRIMARY|PRIMARY KEY
          *@default 
          *@extra auto_increment
          *@nullable NO
@@ -18,6 +18,14 @@
          */
         protected $nome;
         /**
+         *@var int(11)
+         *@key agency|FOREIGN KEY|agenzie|id_agenzia
+         *@default 
+         *@extra 
+         *@nullable YES
+         */
+        protected $agenzia;
+        /**
          *@var varchar(255)
          *@default 
          *@extra 
@@ -26,7 +34,7 @@
         protected $cognome;
         /**
          *@var varchar(16)
-         *@key codice_fiscale
+         *@key codice_fiscale|UNIQUE
          *@default 
          *@extra 
          *@nullable NO
@@ -37,6 +45,9 @@
         }
         public function setNome($nome){
             $this->nome=$nome;
+        }
+        public function setAgenzia($agenzia){
+            $this->agenzia=$agenzia;
         }
         public function setCognome($cognome){
             $this->cognome=$cognome;
@@ -49,6 +60,9 @@
         }
         public function getNome(){
             return $this->nome;
+        }
+        public function getAgenzia(){
+            return $this->agenzia;
         }
         public function getCognome(){
             return $this->cognome;
