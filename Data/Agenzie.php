@@ -17,13 +17,13 @@
          *@nullable NO
          */
         protected $nome;
-        public function setId_agenzia($id_agenzia){
-            $this->id_agenzia=$id_agenzia;
+        public function setIdAgenzia($id_agenzia){
+             $this->id_agenzia=$id_agenzia;
         }
         public function setNome($nome){
-            $this->nome=$nome;
+             $this->nome=$nome;
         }
-        public function getId_agenzia(){
+        public function getIdAgenzia(){
             return $this->id_agenzia;
         }
         public function getNome(){

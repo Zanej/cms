@@ -1,80 +1,22 @@
 <?php
     namespace CMS\DbWorkers;
-	/** 
-	 * Interfaccia per gestire un elemento generico del db
-	 */
-	interface Element{
-		/**
-		 * Costruttore che inizializza l'elemento, chiama create se nel db l'elemento non esiste, update se esiste
-		 * @param id id dell'elemento, null se bisogna crearlo
-		 * @param params parametri da inserire/modificare
-		 * @param key_name nome del campo chiave
-		 * @param table_name nome della tabella su cui lavorare
-		 * @param md5 indica se l'elemento passato per la select Ã¨ md5
-		 */
-		function __construct($id=null,$params="*",$key_name=null,$table_name=null,$md5=false);
-		/**
-		 * Funzione che inserisce l'elemento nel db
-		 */
-		function create($params);
-		/**
-		 * Funzione che effettua l'update nel db
-		 */
-		function update($params);
-		/**
-		 * Ritorna l'id dell'elemento
-		 */
-		function getParams();
-		/**
-		 * Aggiorna i parametri dopo la creazione o la modifica nel database
-		 */
-		function updateParams($id=null,$params="*",$md5=false);
-		/**
-		 * Ritorna il risultato delle operazioni (success,error,message)
-		 */
-		function getResult();
-		/**
-		 * Ritorna il parametro dal database
-		 * @param $name nome del parametro
-		 */
-		function get($name);
-		/**
-		 * Imposta la tabella
-		 */
-		function setTable($table_name);
-		/**
-		 * Ritorna la chiave primaria dell'elemento
-		 */
-		function getId();
-		/**
-		 * Imposta il campo chiave
-		 */
-		function setKey($key_name);
-		/**
-		 * Ritorna se il singolo campo Ã¨ uguale a quello passato
-		 */
-		function isEqual($key,$val);
-		/**
-		 * Ritorna se i dati inseriti sono uguali a quelli dell'elemento
-		 */
-		function areParamsEqual($params);
-	}
 	/**
 	 * Classe per gestire un elemento generico del db
 	 */
-	class DbElement implements Element{
+	class DbElement{
 		protected $conn;
 		protected $params;
 		protected $return;
 		protected $table;
 		protected $key;
-      private $querybuilder;
+        private $querybuilder;
 		/**
 		 * @see Element
 		 */
 		function __construct($id=null,$params="*",$key_name=null,$table_name=null,$md5=false){
 			global $db;
             $this->querybuilder = new QueryBuilder();
+            //print_r($this->querybuilder);   
 			$this->return = array();
 			if (!is_null($key_name)) {
                 $this->key = $key_name;

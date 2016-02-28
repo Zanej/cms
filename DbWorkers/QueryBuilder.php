@@ -90,6 +90,7 @@ class QueryBuilder {
       $this->builders = (Object)[
          "action","values","from","where","join","group","having","order","limit" 
       ];
+      //print_r($this->builders);
    }
    /**
     * 

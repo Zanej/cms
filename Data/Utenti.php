@@ -41,19 +41,19 @@
          */
         protected $codice_fiscale;
         public function setId($id){
-            $this->id=$id;
+             $this->id=$id;
         }
         public function setNome($nome){
-            $this->nome=$nome;
+             $this->nome=$nome;
         }
         public function setAgenzia($agenzia){
-            $this->agenzia=$agenzia;
+             $this->agenzia=$agenzia;
         }
         public function setCognome($cognome){
-            $this->cognome=$cognome;
+             $this->cognome=$cognome;
         }
-        public function setCodice_fiscale($codice_fiscale){
-            $this->codice_fiscale=$codice_fiscale;
+        public function setCodiceFiscale($codice_fiscale){
+             $this->codice_fiscale=$codice_fiscale;
         }
         public function getId(){
             return $this->id;
@@ -67,7 +67,7 @@
         public function getCognome(){
             return $this->cognome;
         }
-        public function getCodice_fiscale(){
+        public function getCodiceFiscale(){
             return $this->codice_fiscale;
         }
 

@@ -59,6 +59,7 @@
             foreach($tables as $key => $table){
                 //if(!file_exists($filename)){
                     self::designDbClass($table);
+                    self::designDbController($table);
                 //}
             }
         }
@@ -69,9 +70,8 @@
         private static function designDbClass($table){
             $filename = $_SERVER["DOCUMENT_ROOT"]."\Data\\".ucfirst($table).".php";
             $fop = fopen($filename,"w");
-            if(!$fop){
-                throw new \Exception("Errorr");
-            }
+            if(!$fop)
+                throw new \Exception("Error writing file");
             /* @var self::$db MySQL*/
             $keys = self::$db->getAllKeys($table);
             $columnnames = self::$db->GetColumnNames($table);
@@ -80,28 +80,83 @@
             fwrite($fop,$spaces."use CMS\DbWorkers\DbElement; \n");
             fwrite($fop,$spaces."class ".ucfirst($table)." extends DbElement{\n");
             foreach($columnnames as $chiave => $column){
-                fwrite($fop,$spaces.$spaces."/**\n");
-                fwrite($fop,$spaces.$spaces." *@var ".self::$db->getColumnType($column,$table)."\n");
-                if(isset($keys[$column])){
-                    fwrite($fop,$spaces.$spaces." *@key ".$keys[$column]["key_name"]."|".$keys[$column]["key_type"]."\n");
-                }
-                fwrite($fop,$spaces.$spaces." *@default ".self::$db->GetDefaultValue($column,$table)."\n");
-                fwrite($fop,$spaces.$spaces." *@extra ".self::$db->GetColumnExtras($column,$table)."\n");
-                fwrite($fop,$spaces.$spaces." *@nullable ".self::$db->IsNullableColumn($column,$table)."\n");
-                fwrite($fop,$spaces.$spaces." */\n");
-                fwrite($fop,$spaces.$spaces."protected $".$column.";\n");
+                self::designDbVar($fop, $spaces.$spaces, $column, $keys, $table);
             }
             foreach($columnnames as $chiave => $column){
-                fwrite($fop,$spaces.$spaces."public function set".ucfirst($column)."($".$column."){\n");
-                fwrite($fop,$spaces.$spaces.$spaces."\$this->".$column."=$".$column.";\n");
-                fwrite($fop,$spaces.$spaces."}\n");
+                self::designSetter($fop,$spaces.$spaces,$column);
             }
             foreach($columnnames as $chiave => $column){
-                fwrite($fop,$spaces.$spaces."public function get".ucfirst($column)."(){\n");
-                fwrite($fop,$spaces.$spaces.$spaces."return \$this->".$column.";\n");
-                fwrite($fop,$spaces.$spaces."}\n");
+                self::designGetter($fop,$spaces.$spaces,$column);
             }
             fwrite($fop,"\n} ?>");
+        }
+        /**
+         * Designs the controller of a table
+         * @param $table table_name
+         */
+        private static function designDbController($table){
+            $filename = $_SERVER["DOCUMENT_ROOT"]."\Controller\\".ucfirst($table)."Controller.php";
+            $fop = fopen($filename,"w");
+            $spaces="    ";
+            if(!$fop)
+                throw new \Exception ("Error writing file");
+            fwrite($fop,"<?php\n".$spaces."namespace CMS\Controller;\n");
+            fwrite($fop,$spaces."use CMS\DbWorkers\Table; \n");
+            fwrite($fop,$spaces."class ".ucfirst($table)."Controller extends Table{\n");
+            self::designDbControllerConstruct($fop, $spaces.$spaces, $table);
+            fwrite($fop,"\n} ?>");
+        }
+        /**
+         * Design construct of a table controller
+         */
+        private static function designDbControllerConstruct($resource,$indent,$table){
+            fwrite($resource,$indent."function __construct(){\n");
+            fwrite($resource,$indent."    "."parent::__construct('$table');\n");
+            fwrite($resource,$indent."}");
+        }
+        /**
+         * Designs the setter of a variable
+         * @param file resource $resource file resource
+         * @param string $indent spaces to indent
+         * @param string $column name of the variable
+         */
+        private static function designSetter($resource,$indent,$column){
+            $column_set=str_replace(" ","",ucwords(str_replace("_"," ",$column)));
+            fwrite($resource,$indent."public function set".$column_set."($".$column."){\n");
+            fwrite($resource,$indent."     \$this->".$column."=$".$column.";\n");
+            fwrite($resource,$indent."}\n");
+        }
+        /**
+         * Designs the getter of a variable
+         * @param file resource $resource file resource
+         * @param string $indent spaces to indent
+         * @param string $column name of the variable
+         */
+        private static function designGetter($resource,$indent,$column){
+            $column_get=str_replace(" ","",ucwords(str_replace("_"," ",$column)));
+            fwrite($resource,$indent."public function get".$column_get."(){\n");
+            fwrite($resource,$indent."    return \$this->".$column.";\n");
+            fwrite($resource,$indent."}\n");
+        }
+        /**
+         * Designs a db variable
+         * @param file resource $resource file resource
+         * @param string $indent spaces to indent
+         * @param string $column name of the column
+         * @param array $keys table keys array
+         * @param type $table name of the table
+         */
+        private static function designDbVar($resource,$indent,$column,$keys,$table){
+            fwrite($resource,$indent."/**\n");
+            fwrite($resource,$indent." *@var ".self::$db->getColumnType($column,$table)."\n");
+            if(isset($keys[$column])){
+                fwrite($resource,$indent." *@key ".$keys[$column]["key_name"]."|".$keys[$column]["key_type"]."\n");
+            }
+            fwrite($resource,$indent." *@default ".self::$db->GetDefaultValue($column,$table)."\n");
+            fwrite($resource,$indent." *@extra ".self::$db->GetColumnExtras($column,$table)."\n");
+            fwrite($resource,$indent." *@nullable ".self::$db->IsNullableColumn($column,$table)."\n");
+            fwrite($resource,$indent." */\n");
+            fwrite($resource,$indent."protected $".$column.";\n");
         }
     }
 	
