@@ -42,22 +42,6 @@
 		 */
 		function create($params){
 			global $db;
-         
-			/*$query="INSERT INTO ".$this->table." (";
-         $names.=implode(",",array_keys($params));
-         $values="'";
-         $values.=implode("','",$params);
-         $values.="'";
-			$query.=$names.") VALUES (".$values.")";
-			$db->Query($query);
-			if($db->Error()){
-				$this->return["message"] = "Non sono riuscito ad aggiungere l'elemento";
-			} else {
-				$this->return["success"] = true;
-				$this->return["message"] = "Elemento aggiunto";
-				$id = $db->GetLastInsertID();
-				$this->updateParams($id);
-			}*/
          $do = $this->querybuilder->insert($this->table, $params);
          if($id = $do->getResult()){
             $this->return["success"] = true;
@@ -77,7 +61,7 @@
 			$query="UPDATE ".$this->table." SET ";
 			for($i=0;$i<count($params);$i++){
 				if($keys[$i] != "email" && $keys[$i] != "img_orig_facebook" && $keys[$i] != "img" && $keys[$i] != "img_orig_google" && $keys[$i] != "data_ultimo_accesso" && $keys[$i] != "data_ultima_modifica"){
-					$query.=$keys[$i]."='".htmlentities($params[$keys[$i]])."',";
+					$query.=$keys[$i]."='".addslashes(htmlentities($params[$keys[$i]]))."',";
 				}
 				elseif($keys[$i] == "data_ultimo_accesso" || strtolower($keys[$i]) == "data_ultima_modifica"){
 					$query.=$keys[$i]."=".$params[$keys[$i]].",";
@@ -163,12 +147,6 @@
 		/**
 		 * @see Element
 		 */
-		function getInstance(){
-			return $this;
-		}
-		/**
-		 * @see Element
-		 */
 		function getId(){
 			return $this->get($this->key);
 		}
@@ -187,9 +165,9 @@
 			if($tipo == "blob" || $tipo=="string"){
 				return $this->params[$key] == htmlentities($val);
 			}elseif($tipo == "time"){
-				return date('H:i',strtotime($val) == date('H:i',strtotime($this->params[$key])));
+				return date('H:i',strtotime($val)) == date('H:i',strtotime($this->params[$key]));
 			}elseif($tipo == "date"){
-				return date('Y-m-d',strtotime($val) == date('Y-m-d',strtotime($this->params[$key])));
+				return date('Y-m-d',strtotime($val)) == date('Y-m-d',strtotime($this->params[$key]));
 			}
 			else{
 				return $this->params[$key] == $val;

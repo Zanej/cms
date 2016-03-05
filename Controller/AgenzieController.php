@@ -1,8 +1,7 @@
 <?php
     namespace CMS\Controller;
-    use CMS\DbWorkers\Table; 
-    class AgenzieController extends Table{
+    class AgenzieController extends AbstractController{
         function __construct(){
             parent::__construct('agenzie');
         }
-} ?>
+}

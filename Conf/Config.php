@@ -77,8 +77,8 @@
             $columnnames = self::$db->GetColumnNames($table);
             $spaces= "    ";
             fwrite($fop,"<?php\n".$spaces."namespace CMS\Data;\n");
-            fwrite($fop,$spaces."use CMS\DbWorkers\DbElement; \n");
-            fwrite($fop,$spaces."class ".ucfirst($table)." extends DbElement{\n");
+            fwrite($fop,$spaces."use CMS\DbWorkers\AbstractDbElement; \n");
+            fwrite($fop,$spaces."class ".ucfirst($table)." extends AbstractDbElement{\n");
             foreach($columnnames as $chiave => $column){
                 self::designDbVar($fop, $spaces.$spaces, $column, $keys, $table);
             }
@@ -101,8 +101,8 @@
             if(!$fop)
                 throw new \Exception ("Error writing file");
             fwrite($fop,"<?php\n".$spaces."namespace CMS\Controller;\n");
-            fwrite($fop,$spaces."use CMS\DbWorkers\Table; \n");
-            fwrite($fop,$spaces."class ".ucfirst($table)."Controller extends Table{\n");
+            //fwrite($fop,$spaces."use CMS\Controller\AbstractController \n");
+            fwrite($fop,$spaces."class ".ucfirst($table)."Controller extends AbstractController{\n");
             self::designDbControllerConstruct($fop, $spaces.$spaces, $table);
             fwrite($fop,"\n} ?>");
         }
@@ -157,6 +157,20 @@
             fwrite($resource,$indent." *@nullable ".self::$db->IsNullableColumn($column,$table)."\n");
             fwrite($resource,$indent." */\n");
             fwrite($resource,$indent."protected $".$column.";\n");
+        }
+        /**
+         * Reads parameters
+         */
+        public static function readParameters(){
+            $filename = $_SERVER["DOCUMENT_ROOT"]."/Init/parameters.prop";
+            $contents = explode("\n",  file_get_contents($filename));
+            foreach($contents as $val){
+                if(strpos($val,":")){
+                    $def = explode(":",$val);
+                    define(strtoupper(trim($def[0])),trim($def[1]));
+                }
+            }
+            //print_r(get_defined_constants(true)["user"]);
         }
     }
 	

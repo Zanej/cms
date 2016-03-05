@@ -2,11 +2,10 @@
     namespace CMS\DbWorkers;
     use \CMS\Conf\Config;
 	class Table{
-        private $fields;
         private $rows;
-        private $key;
+        protected $key;
         private $name;
-        private $return;
+        private $querybuilder;
         /**
          * 
          * @param type $name
@@ -16,6 +15,7 @@
          */
 		public function __construct($name,$force=false,$get=true,$values=null){
             $this->name = $name;
+            $this->querybuilder = new QueryBuilder();
 			if(is_null($values) && self::exists($name)){
                 $this->key = $this->getKey();
                 if($get){
@@ -69,20 +69,43 @@
 		}
         /**
          * 
+         * @param type $where
+         */
+        public function findBy($where){
+            $arr = $this->querybuilder->select($this->name,"*",$where)->getResult();
+            foreach($arr as $key => $val){
+                $nome_classe = "CMS\Data\\".ucfirst($this->name);
+                if(!class_exists($nome_classe)){
+                    $arr[$key] = new DbElement($val[$this->key],"*",$this->key,$this->name);
+                }else{
+                    $arr[$key] = new $nome_classe($val[$this->key],"*");
+                }
+                
+            }
+            return $arr;
+        }
+        /**
+         * 
          * @param type $params
          * @param type $where
          */
 		public function update($params,$where){
-			//$db_elem = new DbElement(
+			return $this->querybuilder->update($this->name,$params,$where)->getResult();
 		}
+        /**
+         * 
+         */
+        public function delete($where){
+            return $this->querybuilder->delete($this->name, $where)->getResult();
+        }
         /**
          * 
          * @param type $id
          * @param type $params
          */
         public function updateKey($id,$params){
-            $db_elem = new DbElement($id,$this->key,$this->key,$this->name);
-            $db_elem->update($params);
+            $db_elem = new DbElement($id,$params,$this->key,$this->name);
+            //$db_elem->update($params);
             return $db_elem->getResult();
         }
         /**
@@ -95,17 +118,19 @@
             if($what == "*" && $where == "1=1" && $join==""){
                 $arr = Config::getDb()->QueryArray("SELECT * FROM ".$this->name,MYSQLI_ASSOC);
                 foreach($arr as $key => $val){
-                    $classname= "CMS\Data\\".$this->name;
-                    $this->rows[$val[$this->key]] = new $classname($val[$this->key],"*",$this->key,strtolower($this->name));
+                    $classname= "CMS\Data\\".ucfirst($this->name);
+                    //echo $classname;
+                    $this->rows[$val[$this->key]] = new $classname($val[$this->key],"*");
                 }
             }
         }
         /**
          * Returns the primary key
          */
-        private function getKey(){
+        protected function getKey(){
             return Config::getDb()->getPrimaryKey($this->name);
         }
+        
         /**
          * Returns all the foreign keys of this table
          */

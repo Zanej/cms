@@ -3,12 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/Controller/AgenzieController.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/DbElement.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/View.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/Data/Utenti.php</file>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/Conf/Config.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/QueryBuilder.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/AbstractDbElement.php</file>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/Table.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/Controller/UtentiController.php</file>
         </group>
     </open-files>
 </project-private>

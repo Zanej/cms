@@ -1,7 +1,7 @@
 <?php
     namespace CMS\Data;
-    use CMS\DbWorkers\DbElement; 
-    class Agenzie extends DbElement{
+    use CMS\DbWorkers\AbstractDbElement; 
+    class Agenzie extends AbstractDbElement{
         /**
          *@var int(11)
          *@key PRIMARY|PRIMARY KEY

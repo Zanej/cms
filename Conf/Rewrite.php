@@ -87,6 +87,7 @@ spl_autoload_register(function($class){
         require_once(str_replace("//","/",$percorso));
         if($class_name[count($class_name)-1] == "Config"){
             $class::readProperties();
+            $class::readParameters();
         }
     }
 });

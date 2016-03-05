@@ -1,0 +1,1 @@
+[{"time":"2016-03-05 23:38:50","query":"SELECT * FROM utenti AS a WHERE id = '5' ","result":[{"id":"5","nome":"Dennis","agenzia":"1","cognome":"Zanetti","codice_fiscale":"ZNTDNS93S23G642K"}]}]

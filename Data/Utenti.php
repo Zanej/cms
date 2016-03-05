@@ -1,7 +1,7 @@
 <?php
     namespace CMS\Data;
-    use CMS\DbWorkers\DbElement; 
-    class Utenti extends DbElement{
+    use CMS\DbWorkers\AbstractDbElement; 
+    class Utenti extends AbstractDbElement{
         /**
          *@var int(11)
          *@key PRIMARY|PRIMARY KEY

@@ -580,7 +580,7 @@ class MySQL
 		} else {
 			if (is_numeric($column)) $column = $this->GetColumnName($column, $table);
 			$result = $this->mysql_link->query("SELECT " . $column . " FROM " . $table . " LIMIT 1");
-			if ($this->mysql_link->field_count($result) > 0) {
+			if ($this->mysql_link->field_count > 0) {
 				return $this->mysqli_field_type($result, 0);
 			} else {
 				$this->SetError("The specified column or table does not exist, or no data was returned", -1);
@@ -1379,10 +1379,11 @@ class MySQL
 	 */
 	public function Release() {
 		$this->ResetError();
-		if (! $this->last_result) {
+		if (!$this->last_result) {
 			$success = true;
 		} else {
-			$success = $this->last_result->free();
+            $success = $this->mysql_link->close();
+			$this->mysql_link= new \mysqli("p:".$this->db_host,$this->db_user,$this->db_pass,$this->db_dbname);
 			if (! $success) $this->SetError();
 		}
 		return $success;

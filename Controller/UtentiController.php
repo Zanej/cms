@@ -1,7 +1,6 @@
 <?php
     namespace CMS\Controller;
-    use CMS\DbWorkers\Table; 
-    class UtentiController extends Table{
+    class UtentiController extends AbstractController{
         function __construct(){
             parent::__construct('utenti');
         }
