@@ -5,6 +5,7 @@
    use CMS\Controller\UtentiController;
    use CMS\Data\Utenti;
    use CMS\DbWorkers\QueryBuilder;
+   echo "VIEW UTENTI";
    //GENERATE BUNDLE FROM DATABASE
    //Config::dataBundle();
    //CONTROLLER
@@ -37,5 +38,5 @@
    $update = $builder->update("utenti",array("nome"=>"Sinned"),array("nome"=>"Dennis"))
                 ->join("agenzie",array("agenzia"=>"id_agenzia"),array("nome"=>"ASD"),array("nome"=>"WEGO"))
                 ->join(array("utenti","ordini"),array("id"=>"id_cliente"),array("totale"=>"200"),array("totale"=>"100"))->getResult();
-   print_r(QueryBuilder::getQueryHistory());
+   print_r(QueryBuilder::getQueryHistory());*/
    

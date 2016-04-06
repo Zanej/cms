@@ -73,7 +73,8 @@ class QueryBuilder {
         }
         $this->builders->values = substr($this->builders->values,0,-1);
         $this->buildQuery($table, $where);
-        //echo $this->query;
+        echo $this->query;
+        //exit;
         return $this;
     }
     /**
@@ -342,10 +343,10 @@ class QueryBuilder {
     private function selectCached(){
         $db = Config::getDb();
         $cache = $this->isQueryCached();
-        if($cache !== false){
+        /*if($cache !== false){
             $this->addToHistory(true, is_array($cache) ? $cache : false, "Errors");
             return $cache;
-        }
+        }*/
         $arr = $db->QueryArray($this->query,MYSQLI_ASSOC);
         if($db->Error()){
             $this->addToHistory(false, false, $db->Error());

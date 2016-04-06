@@ -1,4 +1,8 @@
 view_asd:
     path:/view_utenti
     page:CMS\View
+view_agenzie:
+    path:/view_agenzie/{$agenzia}/
+    rules:[0-9]+$
+    page:CMS\Controller\AgenzieController\showAction
 

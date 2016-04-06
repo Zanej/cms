@@ -42,12 +42,12 @@ abstract class AbstractController extends Table{
         }
         $this->wheredone[] = $where;
         $associative = parent::findBy($where);
-        $new_arr = [];
-        foreach($associative as $key => $val){
+        $new_arr = $associative;
+        /*foreach($associative as $key => $val){
             $nome_id = ucwords($val->getKeyName());
-            $nome_metodo="get".$nome_id;
+            $nome_metodo="get".str_replace(" ","",ucwords(str_replace("_"," ",$nome_id)));
             $new_arr[$val->$nome_metodo()] = $val;
-        }
+        }*/
         $this->rows[] = $new_arr;
         return $new_arr;
         //print_r($this->rows);
@@ -104,5 +104,25 @@ abstract class AbstractController extends Table{
         foreach($queries as $val){
             $this->findBy($val);
         }
+    }
+    /**
+     * Render a file based on smarty
+     * @param type $templatename Template name
+     * @param type $params parametri
+     */
+    public function render($templatename,$params){
+        if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl")){
+            throw new \Exception("Template not found!");
+        }else{
+            $filename = $_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl";
+        }
+        /* @var CMS\Conf\Smarty $smarty*/
+        $smarty = Config::getSmarter();
+        //print_r($params);
+        //exit;
+        foreach($params as $key => $val){
+            $smarty->assign($key,$val);
+        }
+        $smarty->display($filename);
     }
 }

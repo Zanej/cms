@@ -3,8 +3,10 @@
     use CMS\DbWorkers\Table;
     use CMS\DbWorkers\DbElement;
     use CMS\DbWorkers\MySQL as DB;
+    //use CMS\Conf\smarty\libs\Smarty;
     class Config{
         private static $db;
+        private static $smarter;
         /**
          * 
          * @param string $filename
@@ -70,8 +72,9 @@
         private static function designDbClass($table){
             $filename = $_SERVER["DOCUMENT_ROOT"]."\Data\\".ucfirst($table).".php";
             $fop = fopen($filename,"w");
-            if(!$fop)
+            if(!$fop){
                 throw new \Exception("Error writing file");
+            }
             /* @var self::$db MySQL*/
             $keys = self::$db->getAllKeys($table);
             $columnnames = self::$db->GetColumnNames($table);
@@ -98,8 +101,9 @@
             $filename = $_SERVER["DOCUMENT_ROOT"]."\Controller\\".ucfirst($table)."Controller.php";
             $fop = fopen($filename,"w");
             $spaces="    ";
-            if(!$fop)
+            if(!$fop){
                 throw new \Exception ("Error writing file");
+            }
             fwrite($fop,"<?php\n".$spaces."namespace CMS\Controller;\n");
             //fwrite($fop,$spaces."use CMS\Controller\AbstractController \n");
             fwrite($fop,$spaces."class ".ucfirst($table)."Controller extends AbstractController{\n");
@@ -171,6 +175,18 @@
                 }
             }
             //print_r(get_defined_constants(true)["user"]);
+        }
+        /**
+         * Initialize smarter
+         */
+        public static function setSmarter(){
+            self::$smarter = new \Smarty();
+        }
+        /**
+         * Gets smarty object
+         */
+        public static function getSmarter(){
+            return self::$smarter;
         }
     }
 	

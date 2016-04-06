@@ -73,14 +73,16 @@
          */
         public function findBy($where){
             $arr = $this->querybuilder->select($this->name,"*",$where)->getResult();
-            foreach($arr as $key => $val){
-                $nome_classe = "CMS\Data\\".ucfirst($this->name);
-                if(!class_exists($nome_classe)){
-                    $arr[$key] = new DbElement($val[$this->key],"*",$this->key,$this->name);
-                }else{
-                    $arr[$key] = new $nome_classe($val[$this->key],"*");
+            if(count($arr) > 0){
+                foreach($arr as $key => $val){
+                    $nome_classe = "CMS\Data\\".ucfirst($this->name);
+                    if(!class_exists($nome_classe)){
+                        $arr[$key] = new DbElement($val[$this->key],"*",$this->key,$this->name);
+                    }else{
+                        $arr[$key] = new $nome_classe($val[$this->key],"*");
+                    }
+
                 }
-                
             }
             return $arr;
         }
