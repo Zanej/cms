@@ -42,15 +42,16 @@
 		 */
 		function create($params){
 			global $db;
-         $do = $this->querybuilder->insert($this->table, $params);
-         if($id = $do->getResult()){
-            $this->return["success"] = true;
-				$this->return["message"] = "Elemento aggiunto";
-				//$id = $db->GetLastInsertID();
-				$this->updateParams($id);
-         }else{
-            $this->return["message"] ="Non sono riuscito ad aggiungere l'elemento".$db->Error();
-         }
+            //echo "aaa";
+            $do = $this->querybuilder->insert($this->table, $params);
+            if($id = $do->getResult()){
+               $this->return["success"] = true;
+                   $this->return["message"] = "Elemento aggiunto";
+                   //$id = $db->GetLastInsertID();
+                   $this->updateParams($id);
+            }else{
+               $this->return["message"] ="Non sono riuscito ad aggiungere l'elemento".$db->Error();
+            }
 		}
 		/**
 		 * @see Element

@@ -1,5 +1,5 @@
 <?php
-    namespace CMS\Data;
+    namespace CMS\DataBundle\Entity;
     use CMS\DbWorkers\AbstractDbElement; 
     class Utenti extends AbstractDbElement{
         /**

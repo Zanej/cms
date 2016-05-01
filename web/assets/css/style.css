@@ -1,0 +1,206 @@
+body {
+  position: relative;
+  box-sizing: border-box;
+}
+body,
+html {
+  padding: 0;
+  margin: 0;
+}
+.clear {
+  clear: both;
+}
+.contenitore {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+.contenitore header {
+  width: 100%;
+  height: 200px;
+  background-image: url('/web/assets/images/header_background.jpg');
+  position: relative;
+}
+.contenitore header h3 {
+  font-size: 30px;
+  text-transform: uppercase;
+  width: 100%;
+  text-align: center;
+  color: #FFF;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transform: translate(-50%,-50%);
+  -moz-transform: translate(-50%,-50%);
+  -o-transform: translate(-50%,-50%);
+  -ms-transform: translate(-50%,-50%);
+  transform: translate(-50%,-50%);
+}
+.contenitore .contenuto {
+  margin: 20px 0;
+  position: relative;
+}
+.contenitore .contenuto .form_container {
+  padding: 0 100px;
+}
+.contenitore .contenuto .form_container .input_box {
+  position: relative;
+  width: 45%;
+  padding-right: 5%;
+  float: left;
+  height: auto;
+  margin-bottom: 15px;
+}
+.contenitore .contenuto .form_container .input_box label {
+  width: 100%;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+.contenitore .contenuto .form_container .input_box .text_box {
+  margin-top: 10px;
+  border: 1px solid #CCF;
+  border-radius: 5px;
+  background-clip: padding-box;
+  width: 100%;
+  position: relative;
+  float: left;
+}
+.contenitore .contenuto .form_container .input_box .text_box input[type='text'],
+.contenitore .contenuto .form_container .input_box .text_box input[type='email'] {
+  -webkit-appearance: none;
+  appearance: none;
+  color: #000;
+  width: 100%;
+  float: left;
+  border: 0;
+  padding: 15px;
+}
+.contenitore .contenuto .form_container .input_box .select_box {
+  margin-top: 10px;
+  border: 1px solid #CCF;
+  border-radius: 5px;
+  background-clip: padding-box;
+  width: 100%;
+  position: relative;
+  float: left;
+}
+.contenitore .contenuto .form_container .input_box .select_box:before {
+  content: "select";
+  color: rgba(0,0,0,0);
+  background-image: url('/web/assets/images/select.jpg');
+  background-size: 15px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  -webkit-transform: translateZ(0);
+  -moz-transform: translateZ(0);
+  -o-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transform: translate(0%,-50%);
+  -moz-transform: translate(0%,-50%);
+  -o-transform: translate(0%,-50%);
+  -ms-transform: translate(0%,-50%);
+  transform: translate(0%,-50%);
+}
+.contenitore .contenuto .form_container .input_box .select_box select {
+  -webkit-appearance: none;
+  appearance: none;
+  color: #000;
+  width: 100%;
+  float: left;
+  border: 0;
+  padding: 15px;
+}
+.contenitore .contenuto .form_container .input_box .checkbox_box {
+  margin-top: 10px;
+}
+.contenitore .contenuto .form_container .input_box .checkbox_box input[type="checkbox"] {
+  width: 0;
+  height: 0;
+  display: none;
+  visibility: hidden;
+}
+.contenitore .contenuto .form_container .input_box .checkbox_box input[type="checkbox"] + label {
+  background-image: url('/web/assets/images/not_checked.png');
+  background-position: top left;
+  background-size: 17px 17px;
+  background-repeat: no-repeat;
+  padding-left: 30px;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+.contenitore .contenuto .form_container .input_box .checkbox_box input[type="checkbox"]:checked +label {
+  background-image: url('/web/assets/images/checked.png');
+}
+.contenitore .contenuto .left {
+  float: left;
+  width: 20%;
+}
+@media screen and (max-width: 768px) {
+  .contenitore .contenuto .left {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+.contenitore .contenuto .left ul.filter {
+  width: 90%;
+  padding: 0 5%;
+}
+@media screen and (max-width: 768px) {
+  .contenitore .contenuto .left ul.filter {
+    width: 98%;
+    padding: 1%;
+  }
+}
+.contenitore .contenuto .left ul.filter li {
+  width: 100%;
+  padding: 5px 0;
+  text-align: center;
+  margin: 10px 0;
+  line-height: 20px;
+  border: 1px solid #ccc;
+  display: block;
+}
+.contenitore .contenuto .left ul.filter li a {
+  width: 100%;
+}
+.contenitore .contenuto .left ul.filter li.selected {
+  background-color: #1b6d85;
+  border-color: #1b6d85;
+  color: #fff;
+}
+.contenitore .contenuto .left ul.filter li.selected a {
+  color: #fff;
+}
+.contenitore .contenuto .right {
+  float: left;
+  width: 80%;
+}
+@media screen and (max-width: 768px) {
+  .contenitore .contenuto .right {
+    width: 100%;
+    height: auto;
+  }
+}
+.contenitore .contenuto .input_container {
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.contenitore .contenuto .input_container .select_container {
+  padding: 0 15px;
+  width: 100%;
+}
+.contenitore .contenuto .input_container .select_container select {
+  width: 100%;
+}

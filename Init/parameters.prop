@@ -1,1 +1,5 @@
-cache_reload:600
+cache_reload:1200
+cache_location:table
+less_used:true;
+less_file:/web/assets/css/style.less
+css_file:/web/assets/css/style.css

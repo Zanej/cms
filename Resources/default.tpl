@@ -11,14 +11,18 @@
                     {include file="./header.tpl"}
                 {/block}
             </header>
-            {block name="content"}
-                <div class='nav_left'>
-                    
-                </div>
-                <div class='nav_right'>
-                    
-                </div>
-            {/block}
+            <div class="contenuto">
+                {block name="content"}
+                    <div class='left'>
+                        {block name="left"}
+                        {/block}
+                    </div>
+                    <div class='right'>
+                        {block name="right"}
+                        {/block}
+                    </div>
+                {/block}
+            </div>
             <footer>
                 {block name="footer"}
                     {include file="./footer.tpl"}

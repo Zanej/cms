@@ -8,10 +8,10 @@
         private $querybuilder;
         /**
          * 
-         * @param type $name
-         * @param type $force
-         * @param type $get
-         * @param type $values
+         * @param string $name nome
+         * @param boolean $force if true creates the table if doesn't exist
+         * @param boolean $get returns row if true
+         * @param array $values if table has to be created, these are the fields to be inserted
          */
 		public function __construct($name,$force=false,$get=true,$values=null){
             $this->name = $name;
@@ -40,15 +40,22 @@
             $query = "CREATE TABLE $name (";
             $query.="id INTEGER AUTO_INCREMENT PRIMARY KEY ,";
             foreach($values as $key => $val){
-                $query.=$key." ";
-                $add = explode("|",$val);
-                $query.=" ".$add[0]."(".$add[1].")".$add[2].",";
+                $query.="`".$key."` ".$val.",";
+                /*$add = explode("|",$val);
+                $query.=" ".$add[0]."(".$add[1].")".$add[2].",";*/
             }
             $query =substr($query,0,strlen($query)-1);
             $query.=")";
-            //echo $query;
+            if(strstr(strtolower($query),"references ")){
+                $query.=" ENGINE='InnoDB'";
+                Config::getDB()->Query("SET FOREIGN_KEY_CHECKS=1");
+            }
             if(Config::getDb()->Query($query)){
-                echo json_encode(array("success"=>true));
+                //echo json_encode(array("success"=>true));
+                return true;
+            }else{
+                echo $query;
+                return false;
             }
         }
         /**
@@ -75,7 +82,10 @@
             $arr = $this->querybuilder->select($this->name,"*",$where)->getResult();
             if(count($arr) > 0){
                 foreach($arr as $key => $val){
-                    $nome_classe = "CMS\Data\\".ucfirst($this->name);
+                    $classe = get_class($this);
+                    $namespace_fk = substr($classe,0,strrpos($classe,"\\"));
+                    $namespace = substr($namespace_fk,0,strrpos($namespace_fk,"\\"))."\Entity\\";
+                    $nome_classe = $namespace.ucfirst($this->name);
                     if(!class_exists($nome_classe)){
                         $arr[$key] = new DbElement($val[$this->key],"*",$this->key,$this->name);
                     }else{
@@ -120,8 +130,10 @@
             if($what == "*" && $where == "1=1" && $join==""){
                 $arr = Config::getDb()->QueryArray("SELECT * FROM ".$this->name,MYSQLI_ASSOC);
                 foreach($arr as $key => $val){
-                    $classname= "CMS\Data\\".ucfirst($this->name);
-                    //echo $classname;
+                    $classe = get_class($this);
+                    $namespace_fk = substr(get_class($this),0,strrpos($classe,"\\"));
+                    $namespace = substr($namespace_fk,0,strrpos($namespace_fk,"\\"))."\Entity\\";
+                    $classname= $namespace.ucfirst($this->name);
                     $this->rows[$val[$this->key]] = new $classname($val[$this->key],"*");
                 }
             }

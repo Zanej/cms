@@ -3,6 +3,6 @@ view_asd:
     page:CMS\View
 view_agenzie:
     path:/view_agenzie/{$agenzia}/
-    rules:[0-9]+$
-    page:CMS\Controller\AgenzieController\showAction
+    rules:(^[0-9]+)
+    page:CMS\DataBundle\Controller\AgenzieController\showAction
 

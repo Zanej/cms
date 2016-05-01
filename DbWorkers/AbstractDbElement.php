@@ -42,6 +42,7 @@ abstract class AbstractDbElement extends DbElement{
      * @param array $params
      */
     public function create($params){
+        //print_r($params);
         $ins = $this->qb->insert($this->table,$params)->getResult();
         if($ins !== false){
             $this->return["success"] = true;
@@ -55,11 +56,36 @@ abstract class AbstractDbElement extends DbElement{
      * @param array $params
      */
     public function update($params){
-        $upd = $this->qb->update($table,$params,array($this->getKeyName()=>$this->$this->getKeyName()));
+        $key = $this->getKeyName();
+        $upd = $this->qb->update($this->table,$params,array($key=>$this->$key))->getResult();
         if($upd){
             $this->return["success"] = true;
         }else{
-            $this->return["succes"] = false;
+            $this->return["success"] = false;
+        }
+    }
+    /**
+     * Saves this element to db
+     */
+    public function save(){
+        $vars = get_object_vars($this);
+        foreach($vars as $key => $val){
+            if(!isset($this->params[$key]) || $this->params[$key] == $vars[$key] || 
+                htmlentities($this->params[$key]) == $vars[$key] || $this->params[$key] == htmlentities($vars[$key])){
+                unset($vars[$key]);
+            }
+        }
+        if(count($vars) == 0){
+            $this->return["success"] = true;
+        }else{
+            $variable = $this->getKeyName();
+            $upd = $this->qb->update($this->table,$vars,array($variable=>$this->$variable))->getResult();
+            if($upd){
+                $this->params = $vars;
+                $this->return["success"] = true;
+            }else{
+                $this->return["success"] = false;
+            }
         }
     }
     

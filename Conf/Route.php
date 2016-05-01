@@ -105,17 +105,9 @@ class Route {
             return false;
         }
         $class = substr($method,0,strrpos($method,"\\"));
-        //echo $class;
         if(method_exists($class,$perc[count($perc)-1])){
             return array("class"=>$class,"method"=>$perc[count($perc)-1]);
         }
         return false;
-    }
-    /**
-     * 
-     * @param type $method
-     */
-    static function callMethod($method){
-        
     }
 }

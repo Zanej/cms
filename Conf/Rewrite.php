@@ -1,5 +1,7 @@
 <?php
 namespace CMS\Conf;
+use CMS\Conf\Config as Config;
+error_reporting(E_ERROR);
 require_once(__DIR__."/smarty/libs/Smarty.php");
 class Rewriter{
     private static $routes;
@@ -58,32 +60,6 @@ class Rewriter{
             }
         }
         return false;
-    }
-    /**
-     * Gets parameters from an url
-     * @param type $url
-     */
-    private static function getUrlParameters(&$url){
-        $urlnew = "";
-        $parameters = array();
-        if(substr_count($url,"{") != substr_count($url,"}")){
-            throw new \Exception("Syntax error");
-        }
-        if(strpos($url,"{") === false){
-            return array();
-        }else{
-            $find = explode("{",$url);
-            foreach($find as $key => $val){
-                if($key == 0){
-                    $urlnew.=$val;
-                }else{
-                    $parameters[] = substr($val,0,strpos($val,"}"));
-                    $urlnew.=substr($val,strpos($val,"}")+1);
-                }
-            }
-        }
-        $url = $urlnew;
-        return $parameters;
     }
     /**
      * 
@@ -170,14 +146,21 @@ spl_autoload_register(function($class){
         }
     }
 });
+Config::readParameters();
+Config::setSmarter();
+Config::readProperties();
 $url = $_GET["url"];
 $page = $_SERVER["DOCUMENT_ROOT"]."/web/".$url;
 //echo $page;
 //exit;
+/*if(LESS_USED){
+    require_once($_SERVER["DOCUMENT_ROOT"]."/web/less/lessc.inc.php");
+    $lessc = new \lessc;
+    $lessc->compileFile($_SERVER["DOCUMENT_ROOT"].LESS_FILE,$_SERVER["DOCUMENT_ROOT"].CSS_FILE);
+}*/
 if(file_exists($page)){
     require_once($page);
 }else{
     Rewriter::readRoutes($url);
 }
-//print_r($_GET);
 

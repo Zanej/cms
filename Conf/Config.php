@@ -2,6 +2,8 @@
     namespace CMS\Conf;
     use CMS\DbWorkers\Table;
     use CMS\DbWorkers\DbElement;
+    use CMS\Conf\EntityCreator;
+    use CMS\Conf\ControllerCreator;
     use CMS\DbWorkers\MySQL as DB;
     //use CMS\Conf\smarty\libs\Smarty;
     class Config{
@@ -55,7 +57,7 @@
             }
             $tables = self::$db->GetTables();
             if(!file_exists($_SERVER["DOCUMENT_ROOT"]."\Data")){
-                mkdir($_SERVER["DOCUMENT_ROOT"]."\Data",0777);
+                mkdir($_SERVER["DOCUMENT_ROOT"]."\Data",0755);
             }
             $dir = $_SERVER["DOCUMENT_ROOT"]."\Data";
             foreach($tables as $key => $table){
@@ -66,11 +68,22 @@
             }
         }
         /**
+         * 
+         * @throws \Exception
+         */
+        public static function createBundle($name,$tables){
+            $bundle = new Bundle($name,$tables);
+        }
+        /**
          * Designs the php class of a table
          * @param $table table name
          */
-        private static function designDbClass($table){
-            $filename = $_SERVER["DOCUMENT_ROOT"]."\Data\\".ucfirst($table).".php";
+        private static function designDbClass($table,$bundlename='Data'){
+            $dir = $_SERVER["DOCUMENT_ROOT"]."\\".$bundlename."Bundle\Entity";
+            if(!file_exists($dir)){
+                mkdir($dir,0755);
+            }
+            $filename = $dir."\\".ucfirst($table).".php";
             $fop = fopen($filename,"w");
             if(!$fop){
                 throw new \Exception("Error writing file");
@@ -79,7 +92,7 @@
             $keys = self::$db->getAllKeys($table);
             $columnnames = self::$db->GetColumnNames($table);
             $spaces= "    ";
-            fwrite($fop,"<?php\n".$spaces."namespace CMS\Data;\n");
+            fwrite($fop,"<?php\n".$spaces."namespace CMS\\".$bundlename."Bundle\Entity;\n");
             fwrite($fop,$spaces."use CMS\DbWorkers\AbstractDbElement; \n");
             fwrite($fop,$spaces."class ".ucfirst($table)." extends AbstractDbElement{\n");
             foreach($columnnames as $chiave => $column){
@@ -97,15 +110,19 @@
          * Designs the controller of a table
          * @param $table table_name
          */
-        private static function designDbController($table){
-            $filename = $_SERVER["DOCUMENT_ROOT"]."\Controller\\".ucfirst($table)."Controller.php";
+        private static function designDbController($table,$bundlename="Data"){
+            $dir = $_SERVER["DOCUMENT_ROOT"]."\\".$bundlename."Bundle\Controller";
+            if(!file_exists($dir)){
+                mkdir($dir,0755);
+            }
+            $filename = $dir."\\".ucfirst($table)."Controller.php";
             $fop = fopen($filename,"w");
             $spaces="    ";
             if(!$fop){
                 throw new \Exception ("Error writing file");
             }
-            fwrite($fop,"<?php\n".$spaces."namespace CMS\Controller;\n");
-            //fwrite($fop,$spaces."use CMS\Controller\AbstractController \n");
+            fwrite($fop,"<?php\n".$spaces."namespace CMS\\".$bundlename."Bundle\Controller;\n");
+            fwrite($fop,$spaces."use CMS\Controller\AbstractController; \n");
             fwrite($fop,$spaces."class ".ucfirst($table)."Controller extends AbstractController{\n");
             self::designDbControllerConstruct($fop, $spaces.$spaces, $table);
             fwrite($fop,"\n} ?>");

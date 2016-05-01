@@ -67,13 +67,14 @@ class QueryBuilder {
         $this->flush();
         $this->builders->action = "UPDATE";
         $this->builders->from=$table;
+        //echo $table;
         $this->checkValuesType($what, $table);
         foreach($what as $key => $val){
             $this->builders->values.=" a.$key = '".$val."',";
         }
         $this->builders->values = substr($this->builders->values,0,-1);
         $this->buildQuery($table, $where);
-        echo $this->query;
+        //echo $this->query;
         //exit;
         return $this;
     }
@@ -318,7 +319,7 @@ class QueryBuilder {
     * @global type $db
     * @return boolean
     */
-    public function getResult(){
+    public function getResult($cacheable = true){
         $db = Config::getDb();
         if($this->builders->action == "INSERT"){
             $db->Query($this->query);
@@ -329,7 +330,7 @@ class QueryBuilder {
             $this->addToHistory(false, $db->Error() ? false : true, $db->Error());
             return !($db->Error());
         }elseif($this->builders->action == "SELECT"){
-            return $this->selectCached();
+            return $this->selectCached($cacheable);
         }elseif($this->builders->action == "UPDATE"){
             $res = $db->Query($this->query);
             self::$queryhistory[] = $this->addToHistory(false, $db->Error() ? false : true, $db->Error());
@@ -340,13 +341,20 @@ class QueryBuilder {
      * Gets a select result from cache if is cached, from db if it's not
      * @return array or false
      */
-    private function selectCached(){
+    private function selectCached($cacheable = true){
+        //echo $this->query;
         $db = Config::getDb();
-        $cache = $this->isQueryCached();
-        /*if($cache !== false){
-            $this->addToHistory(true, is_array($cache) ? $cache : false, "Errors");
-            return $cache;
-        }*/
+        if(!$cacheable){
+            $cache = false;
+        }else{
+            $cache = $this->isQueryCached();
+        }
+        if($cache !== false){
+            if($cache != "cached"){
+                $this->addToHistory(true, is_array($cache) ? $cache : false, "Errors");
+                return $cache;
+            }
+        }
         $arr = $db->QueryArray($this->query,MYSQLI_ASSOC);
         if($db->Error()){
             $this->addToHistory(false, false, $db->Error());
@@ -355,9 +363,73 @@ class QueryBuilder {
         if(count($arr) == 1 && count($arr[0]) == 1){
             $arr = $arr[0][0];
         }
-        $this->addToHistory(false, $arr, "");
-        $this->cacheQuery($arr);
+        if(strtolower($this->builders->from) != "cache as a"){
+            //echo "aaaaaaa";
+            $this->addToHistory(false, $arr, "");
+            if($cacheable){
+                $this->cacheQuery($arr);
+            }
+        }
+        
+        if($cache == "cached"){
+            $db->Query("UPDATE cache SET result='".serialize($arr)."',timestamp='".date('Y-m-d H:i:s')."' WHERE key_sql='".md5($this->query)."'");
+        }
         return $arr;
+    }
+    /**
+     * 
+     * @param type $table
+     * @param type $column
+     * @param type $what
+     * @return type
+     */
+    public function alterColumn($table,$column,$what,$type = "",$null=""){
+        $db = Config::getDB();
+        $sql="ALTER TABLE $table ";
+        $sql.=" ALTER COLUMN $column SET $what";
+        $sql = trim($sql);
+        if(strrpos($sql,",") !== false && strrpos($sql,",") == strlen($sql)-1){
+            $sql = substr($sql,0,-1);
+        }
+        if($type || $null){
+            if(trim($null) == "NO"){
+                $null = "NOT NULL";
+            }else{
+                $null= "NULL";
+            }
+            $sql_2 = trim("ALTER TABLE $table MODIFY $column $type $null");            
+            if(strrpos($sql_2,",") !== false && strrpos($sql_2,",") == strlen($sql_2)-1){
+                $sql_2 = substr($sql_2,0,-1);
+            }
+            $db->Query($sql_2);
+        }
+        if(!$what){
+            return true;
+        }else{
+            return $db->Query($sql);
+        }
+    }
+    /**
+     * 
+     * @param type $table
+     * @param type $column
+     * @param type $what
+     * @return type
+     */
+    public function addColumn($table,$column,$what){
+        $db = Config::getDB();
+        $sql="ALTER TABLE $table ";
+        $sql.=" ADD COLUMN $column $what";
+        $sql = trim($sql);
+        if(strrpos($sql,",") !== false && strrpos($sql,",") == strlen($sql)-1){
+            $sql = substr($sql,0,-1);
+        }
+        echo $sql;
+        return $db->Query($sql);
+    }
+    public function dropColumn($table,$column){
+        $db = Config::getDB();
+        return $db->Query("ALTER TABLE $table DROP COLUMN $column");
     }
     /**
      * 
@@ -369,6 +441,7 @@ class QueryBuilder {
         $db = Config::getDB();
         foreach($values as $key => $val){
             $type = $db->GetColumnDataType($key, $table);
+            //echo $type;
             if($type == "VAR_STRING" || $type == "VAR_BLOB"){
                 $values[$key] = addslashes(htmlentities($val));                
             }
@@ -378,49 +451,33 @@ class QueryBuilder {
      * Check if a query is cached
      */
     private function isQueryCached(){
-        $filename = $_SERVER["DOCUMENT_ROOT"]."/var/querycache";
-        $arr = json_decode(file_get_contents($filename));
-        if($arr != "" && is_array($arr)){
-            foreach($arr as $key => $outer){
-                if($outer->query == $this->query){
-                    if(time() - strtotime($outer->time) > CACHE_RELOAD){
-                        unset($arr[$key]);
-                        $new_arr = [];
-                        foreach($arr as $value){
-                            $new_arr = $value;
-                        }
-                        $handle = fopen($filename,'w');
-                        fwrite($handle,json_encode($new_arr));
-                        fclose($handle);
-                        return false;
-                    }else{
-                        if(is_array($outer->result)){
-                            $result = $outer->result;
-                            foreach($result as $key => $res_obj){
-                                $result[$key] = get_object_vars($res_obj);
-                            }
-                            return $result;
-                        }
-                    }
-                    return $outer->result;
-                }
+        global $db;
+        $query = "SELECT id_cache,key_sql,result,timestamp FROM cache WHERE key_sql='".md5($this->query)."' LIMIT 1";
+        $arr = $db->QueryArray($query,MYSQL_ASSOC);
+        if(!$arr){
+            return false;
+        }else{
+            if(strtotime($arr[0]["timestamp"]) <= (strtotime(date('Y-m-d H:i:s')) - CACHE_RELOAD)){
+                return "cached";
             }
+            return unserialize($arr[0]["result"]);
         }
-        return false;
     }
     /**
      * Caches a query
      */
     private function cacheQuery($results){
-        $filename =$_SERVER["DOCUMENT_ROOT"]."/var/querycache";
-        $arr = json_decode(file_get_contents($filename));
-        $query["time"]=date('Y-m-d H:i:s');
-        $query["query"]=$this->query;
-        $query["result"]=$results;
-        $arr[] = $query;
-        $handle = fopen($filename,"w");
-        fwrite($handle,json_encode($arr));
-        fclose($handle);
+        global $db;
+        if(!$this->query){
+            return false;
+        }
+        if(is_null($results) || count($results) == 0){
+            $send = "";
+        }else{
+            $send = serialize($results);
+        }
+        $sql = "INSERT INTO cache (key_sql,result) VALUES('".md5($this->query)."','".$send."')";
+        $db->Query($sql);
     }
     /**
      * Adds a query to query history
@@ -436,6 +493,7 @@ class QueryBuilder {
             $result["error"] = $error;
         }
         self::$queryhistory[] = $result;
+        //print_r(self::$queryhistory);
     }
     /**
      * Returns query history

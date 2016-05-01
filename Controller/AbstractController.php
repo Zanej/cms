@@ -41,6 +41,9 @@ abstract class AbstractController extends Table{
             return $this->rows[$find];
         }
         $this->wheredone[] = $where;
+        if($where == "*"){
+            $where = "";
+        }
         $associative = parent::findBy($where);
         $new_arr = $associative;
         /*foreach($associative as $key => $val){
@@ -124,5 +127,8 @@ abstract class AbstractController extends Table{
             $smarty->assign($key,$val);
         }
         $smarty->display($filename);
+    }
+    public function getRows(){
+        return $this->findBy("*");
     }
 }
