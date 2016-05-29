@@ -1,5 +1,6 @@
 cache_reload:1200
 cache_location:table
+admin_dir:admin
 less_used:true;
 less_file:/web/assets/css/style.less
 css_file:/web/assets/css/style.css

@@ -1935,7 +1935,7 @@ class MySQL
 			
 			// Execute the UPDATE
 			if (! $this->Query($sql)) {
-				echo $sql;	
+				//echo $sql;	
 				return false;
 				
 			} else {

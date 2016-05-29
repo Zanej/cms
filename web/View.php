@@ -2,11 +2,11 @@
    namespace CMS\View;
    use CMS\Conf\Bundle;
    $nome = "ordini";
-   $bundle = new Bundle("Admin", array("box","gruppi_sezioni","sezioni","adm_users"));
-   $bundle->createController("box");
+   $bundle = new Bundle("Admin", array("sezioni","conf_table","sezioni_filtri","lang_traduction"),1);
+   /*$bundle->createController("box");
    $bundle->createController("gruppi_sezioni");
    $bundle->createController("sezioni");
-   $bundle->createController("adm_users");
+   $bundle->createController("adm_users");*/
    
    /*$bundle = new \CMS\Conf\Bundle("Admin",array(
        "adm_users"=>array(

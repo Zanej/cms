@@ -1,6 +1,9 @@
 <?php
     namespace CMS\AdminBundle\Entity;
     use CMS\DbWorkers\AbstractDbElement; 
+    use CMS\AdminBundle\Controller\TodolistController;
+    use CMS\AdminBundle\Entity\Todolist;
+    use CMS\AdminBundle\Controller\SezioniController;
     class Adm_users extends AbstractDbElement{
         /**
          *@var int(11)
@@ -15,9 +18,24 @@
          *@key username|UNIQUE
          *@default 
          *@extra 
-         *@nullable YES
+         *@nullable NO
          */
         protected $username;
+        /**
+         *@var varchar(255)
+         *@default 
+         *@extra 
+         *@nullable NO
+         */
+        protected $password;
+        /**
+         *@var varchar(255)
+         *@key email|UNIQUE
+         *@default 
+         *@extra 
+         *@nullable NO
+         */
+        protected $email;
         /**
          *@var varchar(255)
          *@default 
@@ -66,6 +84,12 @@
         public function setUsername($username){
             $this->username=$username;
         }
+        public function setPassword($password){
+            $this->password=$password;
+        }
+        public function setEmail($email){
+            $this->email=$email;
+        }
         public function setNome($nome){
             $this->nome=$nome;
         }
@@ -90,6 +114,12 @@
         public function getUsername(){
             return $this->username;
         }
+        public function getPassword(){
+            return $this->password;
+        }
+        public function getEmail(){
+            return $this->email;
+        }
         public function getNome(){
             return $this->nome;
         }
@@ -107,5 +137,17 @@
         }
         public function getLivello(){
             return $this->livello;
+        }
+        public function getSezioni(){
+            $sezionic = new SezioniController();
+            return $sezionic->findBy(array("livello"=>$this->getLivello()),false);
+        }
+        public function getTodoList(){
+            $todolistc = new TodolistController();
+            return $todolistc->findBy(array("id_user"=>$this->getId()),false);
+        }
+        public function getGruppiSezioni(){
+            $controller_s = new SezioniController();
+            return $controller_s->getGruppiByLevel($this->getLivello());            
         }
     }

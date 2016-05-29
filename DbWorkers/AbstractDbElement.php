@@ -32,7 +32,10 @@ abstract class AbstractDbElement extends DbElement{
      */
     public function getKeyName(){
         $this_class = get_class($this);
-        $name = "\\".substr($this_class,0,strpos($this_class,"\\"));
+        $pos_first = strpos($this_class,"\\");
+        $pos_second = strpos($this_class,"\\",$pos_first+1);
+        //$first = "\\".substr($this_class,0,$pos_first);
+        $name = "\\".substr($this_class,0,$pos_second);
         $name.="\Controller\\".substr($this_class,strrpos($this_class,"\\")+1)."Controller";
         /* @var AbstractController $name*/
         return $name::getKeyName();
@@ -68,13 +71,13 @@ abstract class AbstractDbElement extends DbElement{
      * Saves this element to db
      */
     public function save(){
-        $vars = get_object_vars($this);
-        foreach($vars as $key => $val){
-            if(!isset($this->params[$key]) || $this->params[$key] == $vars[$key] || 
+        $vars = get_object_vars($this);        
+        foreach($vars as $key => $val){                        
+            if(!array_key_exists($key,$this->params) || $this->params[$key] == $vars[$key] || 
                 htmlentities($this->params[$key]) == $vars[$key] || $this->params[$key] == htmlentities($vars[$key])){
                 unset($vars[$key]);
             }
-        }
+        }                
         if(count($vars) == 0){
             $this->return["success"] = true;
         }else{

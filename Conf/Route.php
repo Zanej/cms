@@ -19,13 +19,16 @@ class Route {
         $where = 0;
         for($i=1;$i<=strlen($route);$i++){
             if(substr($url,0,$i) == substr($route,0,$i)){
-                $prefix.=$url[$i-1];
+                $prefix.=$url[$i-1];                                
             }else{
-                $where = $i-1;
+                $where = $i-1;                
                 break;
             }
+        }        
+        if($where == 0 && $url != "" && $prefix != $route){
+            return false;
         }
-        if($prefix == $route){
+        if($prefix == $route){            
             return true;
         }else{
             if(substr_count($route,"{") == 0){
@@ -35,9 +38,9 @@ class Route {
                 throw new \Exception("Syntax error in route $route");
             }
             $keys = substr($route,$where);
-            $params = substr($url,$where);
+            $params = substr($url,$where);               
             $values = self::getUrlParams($params, $keys);
-            if(count($values) > 0){
+            if(count($values) > 0){                
                 return $values;
             }else{
                 return false;
@@ -53,7 +56,7 @@ class Route {
         $values = array();
         $chiavi = array();
         $counter = 0;
-        $offset_val = 0;
+        $offset_val = 0;       
         for($j=0;$j<strlen($exafterurl);$j++){
             $pos_graf = strpos($exafterurl,"{",$j);
             $pos = strpos($exafterurl,"}",$j);
@@ -100,7 +103,10 @@ class Route {
             $file.=$perc[$i]."/";
         }
         $file_php = $perc[count($perc)-2];
+        
         $filename = Rewriter::fileVariants($file, $file_php);
+        
+        
         if($filename === false){
             return false;
         }

@@ -54,7 +54,7 @@
                 //echo json_encode(array("success"=>true));
                 return true;
             }else{
-                echo $query;
+                //echo $query;
                 return false;
             }
         }
@@ -77,9 +77,13 @@
         /**
          * 
          * @param type $where
+         * @param boolean $cacheable
          */
-        public function findBy($where){
-            $arr = $this->querybuilder->select($this->name,"*",$where)->getResult();
+        public function findBy($where,$cacheable = true,$fields="*"){
+            if(is_array($fields)){
+                $fields = implode(",",$fields);
+            }
+            $arr = $this->querybuilder->select($this->name,$fields,$where)->getResult($cacheable);
             if(count($arr) > 0){
                 foreach($arr as $key => $val){
                     $classe = get_class($this);
@@ -137,6 +141,19 @@
                     $this->rows[$val[$this->key]] = new $classname($val[$this->key],"*");
                 }
             }
+        }
+        /**
+         * 
+         * @return QueryBuilder object
+         */
+        public function getQB(){
+            return $this->querybuilder;
+        }
+        /**
+         * 
+         */
+        public function getTableName(){
+            return $this->name;
         }
         /**
          * Returns the primary key

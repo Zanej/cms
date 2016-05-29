@@ -3,16 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/Conf/Rewrite_adm.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/Conf/Route.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/Init/routing.prop</file>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/Conf/Rewrite.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/DbElement.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/.htaccess</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/Conf/ControllerCreator.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/AbstractDbElement.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/AdminBundle/Entity/Sezioni.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/Controller/AbstractController.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/AdminBundle/Controller/SezioniController.php</file>
             <file>file:/C:/Users/zane2/Documents/progetti/cms/AdminBundle/Controller/Adm_usersController.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/web/View.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/admin/index.php</file>
-            <file>file:/C:/Users/zane2/Documents/progetti/cms/Conf/Bundle.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/Resources/admin/sezioni.tpl</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/DbWorkers/Table.php</file>
+            <file>file:/C:/Users/zane2/Documents/progetti/cms/AdminBundle/Entity/Sezioni_filtri.php</file>
         </group>
     </open-files>
 </project-private>

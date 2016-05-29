@@ -25,4 +25,10 @@
     <div class="nome">
         {$agenzia->getNome()}
     </div>
+    <!--<div class="form_container">
+        <div class="input_box">
+            <label>Nome</label>
+            <input type="text" name="nome"/>
+        </div>
+    </div>-->
 {/block}

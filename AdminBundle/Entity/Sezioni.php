@@ -2,6 +2,7 @@
     namespace CMS\AdminBundle\Entity;
     use CMS\DbWorkers\AbstractDbElement; 
     class Sezioni extends AbstractDbElement{
+    use CMS\AdminBundle\Controller\Conf_tableController;
         /**
          *@var int(11)
          *@key PRIMARY|PRIMARY KEY
@@ -60,6 +61,20 @@
          */
         protected $table;
         /**
+         *@var varchar(255)
+         *@default 
+         *@extra 
+         *@nullable YES
+         */
+        protected $object;
+        /**
+         *@var varchar(255)
+         *@default 
+         *@extra 
+         *@nullable YES
+         */
+        protected $where;
+        /**
          *@var enum('0','1')
          *@default 
          *@extra 
@@ -111,6 +126,12 @@
         public function setTable($table){
             $this->table=$table;
         }
+        public function setObject($object){
+            $this->object=$object;
+        }
+        public function setWhere($where){
+            $this->where=$where;
+        }
         public function setInsert($insert){
             $this->insert=$insert;
         }
@@ -147,6 +168,12 @@
         public function getTable(){
             return $this->table;
         }
+        public function getObject(){
+            return $this->object;
+        }
+        public function getWhere(){
+            return $this->where;
+        }
         public function getInsert(){
             return $this->insert;
         }
@@ -159,4 +186,7 @@
         public function getLivello(){
             return $this->livello;
         }
+        public function getCampi(){
+            $controller_conf = new Conf_tableController();
+        }        
     }

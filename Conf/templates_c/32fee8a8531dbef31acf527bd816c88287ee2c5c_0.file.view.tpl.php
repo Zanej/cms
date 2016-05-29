@@ -1,17 +1,17 @@
 <?php
-/* Smarty version 3.1.29, created on 2016-04-09 23:13:23
+/* Smarty version 3.1.29, created on 2016-05-14 09:51:52
   from "C:\Users\zane2\Documents\progetti\cms\Resources\view.tpl" */
 
 if ($_smarty_tpl->smarty->ext->_validateCompiled->decodeProperties($_smarty_tpl, array (
   'has_nocache_code' => false,
   'version' => '3.1.29',
-  'unifunc' => 'content_57097073b29c85_42780718',
+  'unifunc' => 'content_5736d91858ee56_57382010',
   'file_dependency' => 
   array (
     '32fee8a8531dbef31acf527bd816c88287ee2c5c' => 
     array (
       0 => 'C:\\Users\\zane2\\Documents\\progetti\\cms\\Resources\\view.tpl',
-      1 => 1460236402,
+      1 => 1463172295,
       2 => 'file',
     ),
   ),
@@ -20,13 +20,13 @@ if ($_smarty_tpl->smarty->ext->_validateCompiled->decodeProperties($_smarty_tpl,
     'file:./default.tpl' => 1,
   ),
 ),false)) {
-function content_57097073b29c85_42780718 ($_smarty_tpl) {
+function content_5736d91858ee56_57382010 ($_smarty_tpl) {
 $_smarty_tpl->ext->_inheritance->init($_smarty_tpl, true);
 ?>
 
 <?php 
 $_smarty_tpl->ext->_inheritance->processBlock($_smarty_tpl, 0, "header", array (
-  0 => 'block_2883257097073a2e583_92499776',
+  0 => 'block_1555736d9182f3041_19160089',
   1 => false,
   3 => 0,
   2 => 0,
@@ -35,7 +35,7 @@ $_smarty_tpl->ext->_inheritance->processBlock($_smarty_tpl, 0, "header", array (
 
 <?php 
 $_smarty_tpl->ext->_inheritance->processBlock($_smarty_tpl, 0, "left", array (
-  0 => 'block_2568957097073a37a39_93021729',
+  0 => 'block_113205736d918303210_59873789',
   1 => false,
   3 => 0,
   2 => 0,
@@ -44,7 +44,7 @@ $_smarty_tpl->ext->_inheritance->processBlock($_smarty_tpl, 0, "left", array (
 
 <?php 
 $_smarty_tpl->ext->_inheritance->processBlock($_smarty_tpl, 0, "right", array (
-  0 => 'block_207857097073b1e104_58588310',
+  0 => 'block_51375736d918579713_54607759',
   1 => false,
   3 => 0,
   2 => 0,
@@ -55,7 +55,7 @@ $_smarty_tpl->ext->_inheritance->processBlock($_smarty_tpl, 0, "right", array (
 $_smarty_tpl->smarty->ext->_subtemplate->render($_smarty_tpl, "file:./default.tpl", $_smarty_tpl->cache_id, $_smarty_tpl->compile_id, 0, $_smarty_tpl->cache_lifetime, array(), 2, false);
 }
 /* {block 'header'}  file:C:/Users/zane2/Documents/progetti/cms//Resources/view.tpl */
-function block_2883257097073a2e583_92499776($_smarty_tpl, $_blockParentStack) {
+function block_1555736d9182f3041_19160089($_smarty_tpl, $_blockParentStack) {
 ?>
 
     <h3>Agenzie</h3>
@@ -63,7 +63,7 @@ function block_2883257097073a2e583_92499776($_smarty_tpl, $_blockParentStack) {
 }
 /* {/block 'header'} */
 /* {block 'left'}  file:C:/Users/zane2/Documents/progetti/cms//Resources/view.tpl */
-function block_2568957097073a37a39_93021729($_smarty_tpl, $_blockParentStack) {
+function block_113205736d918303210_59873789($_smarty_tpl, $_blockParentStack) {
 ?>
 
     <!--<h3>Agenzie</h3>-->
@@ -111,13 +111,19 @@ $_smarty_tpl->tpl_vars['key'] = $__foreach_val_0_saved_key;
 }
 /* {/block 'left'} */
 /* {block 'right'}  file:C:/Users/zane2/Documents/progetti/cms//Resources/view.tpl */
-function block_207857097073b1e104_58588310($_smarty_tpl, $_blockParentStack) {
+function block_51375736d918579713_54607759($_smarty_tpl, $_blockParentStack) {
 ?>
 
     <div class="nome">
         <?php echo $_smarty_tpl->tpl_vars['agenzia']->value->getNome();?>
 
     </div>
+    <!--<div class="form_container">
+        <div class="input_box">
+            <label>Nome</label>
+            <input type="text" name="nome"/>
+        </div>
+    </div>-->
 <?php
 }
 /* {/block 'right'} */

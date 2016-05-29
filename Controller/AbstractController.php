@@ -35,7 +35,7 @@ abstract class AbstractController extends Table{
      * Finds records by attributes
      * @param type $where
      */
-    public function findBy($where){
+    public function findBy($where,$cacheable = true,$fields = "*"){
         $find = $this->isInController($where);
         if($find !== false){
             return $this->rows[$find];
@@ -44,7 +44,8 @@ abstract class AbstractController extends Table{
         if($where == "*"){
             $where = "";
         }
-        $associative = parent::findBy($where);
+        $associative = parent::findBy($where,$cacheable,$fields);
+        //print_r($associative);
         $new_arr = $associative;
         /*foreach($associative as $key => $val){
             $nome_id = ucwords($val->getKeyName());
@@ -63,9 +64,8 @@ abstract class AbstractController extends Table{
                     $trovato = false;
                 }
             }
-            if($trovato){
-                return $key;
-                
+            if($trovato){                
+                return $key;                
             }
         }
         return false;
@@ -118,15 +118,20 @@ abstract class AbstractController extends Table{
             throw new \Exception("Template not found!");
         }else{
             $filename = $_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl";
-        }
+        }        
+        //echo $filename;
         /* @var CMS\Conf\Smarty $smarty*/
         $smarty = Config::getSmarter();
         //print_r($params);
         //exit;
-        foreach($params as $key => $val){
+        $smarty->assign("COOKIE",$_COOKIE);
+        $smarty->assign("SESSION",$_SESSION);
+        $smarty->assign("GET",$_GET);
+        $smarty->assign("POST",$_POST);
+        foreach($params as $key => $val){            
             $smarty->assign($key,$val);
-        }
-        $smarty->display($filename);
+        }        
+        $smarty->display(str_replace("//","/",$filename));
     }
     public function getRows(){
         return $this->findBy("*");

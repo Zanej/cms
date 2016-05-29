@@ -1,7 +1,10 @@
 <?php
 namespace CMS\Conf;
 use CMS\Conf\Config as Config;
+use \CMS\AdminBundle\Controller\Adm_usersController as AdminController;
+use CMS\AdminBundle\Entity\Adm_users as User;
 error_reporting(E_ERROR);
+session_start();
 require_once(__DIR__."/smarty/libs/Smarty.php");
 class Rewriter{
     private static $routes;
@@ -13,16 +16,17 @@ class Rewriter{
             $f = fopen($filename,"r");
             $r = fread($f,filesize($filename));
             $prop =explode("\n",$r);
-            for($i=0;$i<count($prop);$i++){
+            #print_r($prop);
+            for($i=0;$i<count($prop);$i++){                
                 if(substr($prop[$i],0,4) != "    "){
                     continue;
-                }
+                }                
                 $params = array();
                 $row = true;
                 while($row){
-                    $row = self::readRoutingRow($prop[$i++]);
+                    $row = self::readRoutingRow($prop[$i++]);                    
                     if($row){
-                        $params[$row[0]] = $row[1];
+                        $params[$row[0]] = $row[1];                                                
                     }
                 }
                 $i--;
@@ -50,11 +54,9 @@ class Rewriter{
             }elseif(is_array($is_it)){
                 $method = Route::methodExists($params["page"]);
                 if($method !== false){
-                    $object = new $method["class"];
-                    //exit;
-                    $values = implode(",",$is_it);
-                    return call_user_func_array(array($object,$method["method"]), $is_it);
-                    //return $object->$method["method"]($is_it);
+                    $object = new $method["class"];                    
+                    $values = implode(",",$is_it);                     
+                    return call_user_func_array(array($object,$method["method"]), $is_it);                    
                 }
                 return false;
             }
@@ -72,7 +74,7 @@ class Rewriter{
         if(!strstr($row,":") || substr($row,0,4) != "    "){
             return false;
         }
-        $riga = explode(":",$row);
+        $riga = explode(":",$row);        
         if(count($riga) > 2){
             return false;
         }
@@ -81,7 +83,8 @@ class Rewriter{
             if(substr($riga[$key],0,1) == "/"){
                 $riga[$key] = substr($riga[$key],1);
             }
-        }
+        }        
+        #print_r($riga);
         return $riga;
     }
     /**
@@ -94,8 +97,9 @@ class Rewriter{
         $file = $_SERVER["DOCUMENT_ROOT"]."/web/";
         for($i=1;$i<count($perc)-1;$i++){
             $file.=$perc[$i]."/";
-        }
+        }        
         $file_php = $perc[count($perc)-1];
+        echo $file_php;
         return self::fileVariants($file,$file_php);
     }
     /**
@@ -139,28 +143,68 @@ spl_autoload_register(function($class){
     
     if(file_exists($percorso)){
         require_once(str_replace("//","/",$percorso));
-        if($class_name[count($class_name)-1] == "Config"){
+        /*if($class_name[count($class_name)-1] == "Config"){
             $class::setSmarter();
             $class::readProperties();
             $class::readParameters();
-        }
+        }*/
     }
 });
+
 Config::readParameters();
 Config::setSmarter();
 Config::readProperties();
-$url = $_GET["url"];
-$page = $_SERVER["DOCUMENT_ROOT"]."/web/".$url;
-//echo $page;
-//exit;
-/*if(LESS_USED){
-    require_once($_SERVER["DOCUMENT_ROOT"]."/web/less/lessc.inc.php");
-    $lessc = new \lessc;
-    $lessc->compileFile($_SERVER["DOCUMENT_ROOT"].LESS_FILE,$_SERVER["DOCUMENT_ROOT"].CSS_FILE);
-}*/
-if(file_exists($page)){
-    require_once($page);
+$check_equal = $_GET["url"] == ADMIN_DIR || $_GET["url"] == "/".ADMIN_DIR || $_GET["url"] == ADMIN_DIR."/" || $_GET["url"] == "/".ADMIN_DIR."/";
+$check = substr($_GET["url"],0,strlen(ADMIN_DIR)) == ADMIN_DIR || substr($_GET["url"],0,strlen(ADMIN_DIR)+1) == "/".ADMIN_DIR;
+if($check){
+    $controller = new AdminController();
+}
+if( $check_equal && COUNT($_POST) > 0){           
+    if(AdminController::exists()){
+        $cook = md5($_POST["username"])."|".md5($_POST["password"]);
+        setcookie("authenticate_user",$cook,time()+3600*24*2,"/");
+        $user = $controller->findBy(array("username"=>$_POST["username"]));      
+        if(!isset($_SESSION["admin_user"]) || $_SESSION["admin_user"] != $_COOKIE["authenticate_user"]){
+            $_SESSION["admin_user"] = $_COOKIE["authenticate_user"];
+            $setAccess = true;
+        }else{
+            $setAccess = false;
+        }
+        $controller->dashboardAction($user[0],$setAccess);        
+    }else{        
+        $controller->loginAction();
+    }
+}elseif($check && $controller->isUserLogged ()){    
+    $cook = explode("|",$_COOKIE["authenticate_user"]);
+    $user = $controller->findBy(array("md5(username)"=>$cook[0]));
+    if(!isset($_SESSION["admin_user"]) || $_SESSION["admin_user"] != $_COOKIE["authenticate_user"]){
+        $_SESSION["admin_user"] = $_COOKIE["authenticate_user"];
+        $setAccess = true;
+    }else{
+        $setAccess = false;
+    }
+    if($check_equal){
+        $controller->dashboardAction($user[0], $setAccess);
+    }else{
+        $page = str_replace("//","/",$_SERVER["DOCUMENT_ROOT"]."/".$_GET["url"]);           
+        if(file_exists($page)){
+            require_once($page);
+        }else{
+            $url = $_GET["url"];            
+            Rewriter::readRoutes($url);
+        }
+    }
+}elseif($check){    
+    $controller->loginAction();    
 }else{
-    Rewriter::readRoutes($url);
+    $url = $_GET["url"];        
+    $page = str_replace("//","/",$_SERVER["DOCUMENT_ROOT"]."/".$_GET["url"]);           
+    if(file_exists($page)){
+        require_once($page);
+        exit;
+    }else{
+        Rewriter::readRoutes($url);
+        exit;
+    }
 }
 

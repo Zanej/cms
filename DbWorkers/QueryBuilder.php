@@ -1,12 +1,6 @@
 <?php
 namespace CMS\DbWorkers;
 use CMS\Conf\Config;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of QueryBuilder
  *
@@ -18,9 +12,10 @@ class QueryBuilder {
     private $result;
     private $builders;
     private $alias;
+    private $fields_seen;
     private static $queryhistory;
-    function __construct() {
-        flush();
+    function __construct() {         
+        $this->flush();                
     }
     /**
     * 
@@ -49,10 +44,14 @@ class QueryBuilder {
         $this->builders->action = "SELECT";
         $this->builders->from = $table;
         if(is_array($what)){
+            foreach($what as $k => $w){
+                $what[$k] = "a.".$w;
+                $this->fields_seen[] = $w;
+            }
             $this->builders->values = implode(",",$what);
         }else{
             $this->builders->values = "a.*";
-        }
+        }        
         $this->buildQuery($table,$where);
         return $this;
     }
@@ -67,14 +66,14 @@ class QueryBuilder {
         $this->flush();
         $this->builders->action = "UPDATE";
         $this->builders->from=$table;
-        //echo $table;
+        ////echo $table;
         $this->checkValuesType($what, $table);
         foreach($what as $key => $val){
             $this->builders->values.=" a.$key = '".$val."',";
         }
         $this->builders->values = substr($this->builders->values,0,-1);
         $this->buildQuery($table, $where);
-        //echo $this->query;
+        ////echo $this->query;
         //exit;
         return $this;
     }
@@ -90,7 +89,7 @@ class QueryBuilder {
         $this->builders->from=$table;
         $this->builders->values="";
         $this->buildQuery($table,$where);
-        //echo $this->query; 
+        ////echo $this->query; 
         return $this;
     }
     /**
@@ -146,9 +145,15 @@ class QueryBuilder {
         }
         if(is_array($where)){
             foreach($where as $key => $val){
-                $this->builders->where.="$newalias.$key = '$val' AND ";
+                if(substr($key,0,strlen("md5(")) == "md5("){                    
+                    $this->builders->where.="md5(".$newalias.".".substr($key,strlen("md5("))." = '$val' AND ";
+                }elseif(substr($key,0,strlen("sha1(")) == "sha1("){
+                    $this->builders->where.="sha1(".$newalias.".".substr($key,strlen("sha1("))." = '$val' AND ";
+                }else{
+                    $this->builders->where.="$newalias.$key = '$val' AND ";
+                }
             }
-        }
+        }        
         $this->builders->where = substr($this->builders->where,0,-5);
     }
     /**
@@ -189,6 +194,11 @@ class QueryBuilder {
         $this->builders->values.=",";
         if(is_array($fields)){
             foreach($fields as $val){
+                if(!in_array($val,$this->fields_seen)){
+                    $this->fields_seen[] = $val;
+                }else{
+                    $val.=" as ".$val."_".$this->alias[$alias];
+                }
                 $this->builders->values.="$alias.$val,";
             }
         }
@@ -205,7 +215,7 @@ class QueryBuilder {
         $alias = "";
         $newtable = "";
         foreach($tables as $key => $val){
-            //echo $al;
+            ////echo $al;
             if(($al = array_search($val,$this->alias)) !== false){
                 $newtable = $key == 0 ? $tables[1] : $tables[0];
                 $alias = $al;
@@ -230,14 +240,15 @@ class QueryBuilder {
     /**
     * Flushes, unset old query
     */
-    public function flush(){
+    public function flush(){        
         $this->query = "";
         $this->result = array();
         $this->alias = array();
+        $this->fields_seen = array();
         $this->builders = (Object) [
             "action"=>"","values"=>"","from"=>"","where"=>"","join"=>""
             ,"group"=>"","having"=>"","order"=>"","limit"=>"" 
-        ];
+        ];        
     }
     /**
     * 
@@ -284,6 +295,7 @@ class QueryBuilder {
             if($this->builders->where != ""){
                 $this->query.=" WHERE ".$this->builders->where;
             }
+            ////echo $this->query;
         }elseif($this->builders->action == "DELETE"){
             if($this->builders->where != ""){
                 $this->query= "DELETE FROM ".$this->builders->from." WHERE ".$this->builders->where;
@@ -297,6 +309,7 @@ class QueryBuilder {
                 $this->query.=" WHERE ".$this->builders->where;
             }
         }
+        ////echo $this->query;
     }
     /**
      * 
@@ -304,14 +317,20 @@ class QueryBuilder {
      */
     private function setWhere($where){
         foreach($where as $key => $value){
-            //echo $key." ".$value;
+            ////echo $key." ".$value;
             if($this->builders->action !== "DELETE"){
-                $this->builders->where.="a.$key = '".$value."' AND ";
+                if(substr($key,0,strlen("md5(")) == "md5("){    
+                    $this->builders->where.="md5(a.".substr($key,strlen("md5("))." = '$value' AND ";
+                }elseif(substr($key,0,strlen("sha1(")) == "sha1("){
+                    $this->builders->where.="sha1(a.".substr($key,strlen("sha1("))." = '$value' AND ";
+                }else{                    
+                    $this->builders->where.="a.$key = '".$value."' AND ";
+                }
             }else{
                 $this->builders->where.=$key." = '".$value."' AND ";
             }
             
-        }
+        }        
         $this->builders->where = substr($this->builders->where,0,-4);
     }
     /**
@@ -329,7 +348,7 @@ class QueryBuilder {
             $db->Query($this->query);
             $this->addToHistory(false, $db->Error() ? false : true, $db->Error());
             return !($db->Error());
-        }elseif($this->builders->action == "SELECT"){
+        }elseif($this->builders->action == "SELECT"){            
             return $this->selectCached($cacheable);
         }elseif($this->builders->action == "UPDATE"){
             $res = $db->Query($this->query);
@@ -342,7 +361,7 @@ class QueryBuilder {
      * @return array or false
      */
     private function selectCached($cacheable = true){
-        //echo $this->query;
+        ////echo $this->query;
         $db = Config::getDb();
         if(!$cacheable){
             $cache = false;
@@ -355,7 +374,10 @@ class QueryBuilder {
                 return $cache;
             }
         }
+        //echo $this->query;        
+        //print_r($arr);
         $arr = $db->QueryArray($this->query,MYSQLI_ASSOC);
+//        print_r($arr);
         if($db->Error()){
             $this->addToHistory(false, false, $db->Error());
             return false;
@@ -364,7 +386,7 @@ class QueryBuilder {
             $arr = $arr[0][0];
         }
         if(strtolower($this->builders->from) != "cache as a"){
-            //echo "aaaaaaa";
+            ////echo "aaaaaaa";
             $this->addToHistory(false, $arr, "");
             if($cacheable){
                 $this->cacheQuery($arr);
@@ -424,7 +446,7 @@ class QueryBuilder {
         if(strrpos($sql,",") !== false && strrpos($sql,",") == strlen($sql)-1){
             $sql = substr($sql,0,-1);
         }
-        echo $sql;
+        ////echo $sql;
         return $db->Query($sql);
     }
     public function dropColumn($table,$column){
@@ -441,7 +463,7 @@ class QueryBuilder {
         $db = Config::getDB();
         foreach($values as $key => $val){
             $type = $db->GetColumnDataType($key, $table);
-            //echo $type;
+            ////echo $type;
             if($type == "VAR_STRING" || $type == "VAR_BLOB"){
                 $values[$key] = addslashes(htmlentities($val));                
             }
@@ -453,7 +475,7 @@ class QueryBuilder {
     private function isQueryCached(){
         global $db;
         $query = "SELECT id_cache,key_sql,result,timestamp FROM cache WHERE key_sql='".md5($this->query)."' LIMIT 1";
-        $arr = $db->QueryArray($query,MYSQL_ASSOC);
+        $arr = $db->QueryArray($query,MYSQL_ASSOC);        
         if(!$arr){
             return false;
         }else{
@@ -494,7 +516,7 @@ class QueryBuilder {
         }
         self::$queryhistory[] = $result;
         //print_r(self::$queryhistory);
-    }
+    }    
     /**
      * Returns query history
      */

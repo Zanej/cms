@@ -49,6 +49,9 @@ class Bundle {
                     $keys = Config::getDB()->getAllKeys($name);
                     $creator = new EntityCreator($name, $keys,"", $this->name);
                     $creator->updateFromDatabase();
+                    if(!file_exists($_SERVER["DOCUMENT_ROOT"]."\\".$this->name."Bundle"."\Controller\\".$name."Controller")){
+                        $this->createController($name);
+                    }
                 }
             }
             if($update == 2){
