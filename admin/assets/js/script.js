@@ -1,10 +1,12 @@
 $(document).on("click","body .hamburger",function(){
     if($("body .contenitore .left").hasClass("open")){
         $("body .contenitore .left").removeClass("open",200);
-        $("body .contenitore .left").addClass("closed",200);        
+        $("body .contenitore .left").addClass("closed",200);   
+        $(".hamburger").removeClass("open",200);           
         $("body .contenitore .right").addClass("open",200);                
     }else{
         $("body .contenitore .left").addClass("open",200);
+        $(".hamburger").addClass("open",200);           
         $("body .contenitore .left").removeClass("closed",200);    
         $("body .contenitore .right").removeClass("open",200);        
     }    
@@ -66,8 +68,11 @@ $(document).on("submit","#add_todo",function(e){
     return false; 
 });
 $(document).on("click",".left_group .titolo",function(){
-    $(this).parents(".left_group").toggleClass("open",200);
+    $(this).parents(".left_group").toggleClass("open",200);    
     $(this).parents(".left_group").find(".hidden").toggleClass("show",200);
+});
+$(document).on("click",".element",function(){
+    $(this).toggleClass("open",200);        
 });
 $(document).ready(function(){
    $(".list.hidden .gallery").slick({

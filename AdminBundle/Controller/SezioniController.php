@@ -23,10 +23,10 @@
             //print_r($arr_gruppi);
             return $arr_gruppi;
         }
-        public function showAction($sezione){
+        public function showAction($sezione,$page=""){
             $sezione = new Sezioni($sezione);  
             $user = new Adm_usersController();
             $username = $user->getUserLogged();
-            return $this->render("admin/sezioni",array("sezione"=>$sezione,"user"=>$username));
+            return $this->render("admin/sezioni",array("sezione"=>$sezione,"user"=>$username,"page"=>$page));
         }
     }

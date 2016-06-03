@@ -79,12 +79,16 @@
          * @param type $where
          * @param boolean $cacheable
          */
-        public function findBy($where,$cacheable = true,$fields="*"){
-            if(is_array($fields)){
+        public function findBy($where,$cacheable = true,$fields="*",$limit_from="",$limit_to=""){
+            /*if(is_array($fields)){
                 $fields = implode(",",$fields);
+            }*/
+            if($limit_from){               
+                $arr = $this->querybuilder->select($this->name,$fields,$where)->limit($limit_from,$limit_to)->getResult($cacheable);            
+            }else{
+                $arr = $this->querybuilder->select($this->name,$fields,$where)->getResult($cacheable);            
             }
-            $arr = $this->querybuilder->select($this->name,$fields,$where)->getResult($cacheable);
-            if(count($arr) > 0){
+            if(is_array($arr) && count($arr) > 0){
                 foreach($arr as $key => $val){
                     $classe = get_class($this);
                     $namespace_fk = substr($classe,0,strrpos($classe,"\\"));

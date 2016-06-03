@@ -1,5 +1,6 @@
 <header>
-    <div class="hamburger">        
+    <div class="hamburger">  
+        <i class="fa fa-bars"></i>
     </div><!--hamburger-->
     <div class="float_right">
         Welcome back, {$user->getNome()}<br> your last login: {date("d/m/Y H:i",strtotime($user->getUltimoAccesso()))}

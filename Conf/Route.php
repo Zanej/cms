@@ -24,7 +24,7 @@ class Route {
                 $where = $i-1;                
                 break;
             }
-        }        
+        }
         if($where == 0 && $url != "" && $prefix != $route){
             return false;
         }
@@ -38,8 +38,8 @@ class Route {
                 throw new \Exception("Syntax error in route $route");
             }
             $keys = substr($route,$where);
-            $params = substr($url,$where);               
-            $values = self::getUrlParams($params, $keys);
+            $params = substr($url,$where);      
+            $values = self::getUrlParams($params, $keys);       
             if(count($values) > 0){                
                 return $values;
             }else{
@@ -56,7 +56,14 @@ class Route {
         $values = array();
         $chiavi = array();
         $counter = 0;
-        $offset_val = 0;       
+        $offset_val = 0;
+        $val_s = substr($afterurl,strlen($afterurl)-1,1) == "/" ? substr($afterurl,0,-1) : $afterurl;
+        $val_e = substr($exafterurl,strlen($exafterurl)-1,1) == "/" ? substr($exafterurl,0,-1) : $exafterurl;
+        $search = explode("/",$val_s);
+        $search_c = explode("/",$val_e);
+        if(count($search) != count($search_c)){
+            return false;
+        }        
         for($j=0;$j<strlen($exafterurl);$j++){
             $pos_graf = strpos($exafterurl,"{",$j);
             $pos = strpos($exafterurl,"}",$j);
@@ -74,7 +81,7 @@ class Route {
                 $divisore = substr($exafterurl,$pos+1,($new_pos_graf-$pos-1));
                 $find = strpos($afterurl,$divisore,$offset_val);
                 $values[$counter] = substr($afterurl,$offset_val,$find-$offset_val);
-                $offset_val = $find+1;
+                $offset_val = strpos($afterurl,"/",$find+1)+1;
             }else{
                 $values[$counter] = substr($afterurl,$offset_val);
                 if(substr($values[$counter],strlen($values[$counter]-1) == "/")){
@@ -83,8 +90,6 @@ class Route {
             }
             $counter++;
             $j = $pos;
-            //echo $pos;
-            //exit;
         }
         $val_array = array();
         foreach($chiavi as $key => $val){

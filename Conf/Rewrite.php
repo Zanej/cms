@@ -55,7 +55,7 @@ class Rewriter{
                 $method = Route::methodExists($params["page"]);
                 if($method !== false){
                     $object = new $method["class"];                    
-                    $values = implode(",",$is_it);                     
+                    $values = implode(",",$is_it);                                       
                     return call_user_func_array(array($object,$method["method"]), $is_it);                    
                 }
                 return false;
@@ -83,8 +83,10 @@ class Rewriter{
             if(substr($riga[$key],0,1) == "/"){
                 $riga[$key] = substr($riga[$key],1);
             }
-        }        
-        #print_r($riga);
+        }
+//        echo "<pre>";
+//            print_r($riga);
+//        echo "</pre>";
         return $riga;
     }
     /**

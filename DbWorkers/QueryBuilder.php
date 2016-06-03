@@ -42,7 +42,7 @@ class QueryBuilder {
     public function select($table,$what,$where){
         $this->flush();
         $this->builders->action = "SELECT";
-        $this->builders->from = $table;
+        $this->builders->from = $table;        
         if(is_array($what)){
             foreach($what as $k => $w){
                 $what[$k] = "a.".$w;
@@ -268,6 +268,9 @@ class QueryBuilder {
             if($this->builders->where != ""){
                 $this->query.=" WHERE ".$this->builders->where;
             }
+            if($this->builders->limit != ""){                
+                $this->query.=" LIMIT ".$this->builders->limit;
+            }
         }elseif($this->builders->action == "UPDATE"){
             $this->query.=$this->builders->from.$this->builders->join." SET ".$this->builders->values;
             if($this->builders->where != ""){
@@ -294,6 +297,9 @@ class QueryBuilder {
             $this->query = "SELECT ".$this->builders->values." FROM ".$this->builders->from; 
             if($this->builders->where != ""){
                 $this->query.=" WHERE ".$this->builders->where;
+            }            
+            if($this->builders->limit != ""){                
+                $this->query.=" LIMIT ".$this->builders->limit;
             }
             ////echo $this->query;
         }elseif($this->builders->action == "DELETE"){
@@ -309,7 +315,7 @@ class QueryBuilder {
                 $this->query.=" WHERE ".$this->builders->where;
             }
         }
-        ////echo $this->query;
+        #echo $this->query;
     }
     /**
      * 
@@ -348,7 +354,7 @@ class QueryBuilder {
             $db->Query($this->query);
             $this->addToHistory(false, $db->Error() ? false : true, $db->Error());
             return !($db->Error());
-        }elseif($this->builders->action == "SELECT"){            
+        }elseif($this->builders->action == "SELECT"){               
             return $this->selectCached($cacheable);
         }elseif($this->builders->action == "UPDATE"){
             $res = $db->Query($this->query);
@@ -360,8 +366,11 @@ class QueryBuilder {
      * Gets a select result from cache if is cached, from db if it's not
      * @return array or false
      */
-    private function selectCached($cacheable = true){
-        ////echo $this->query;
+    private function selectCached($cacheable = true){        
+        if($this->builders->limit != ""){
+            $this->query.= " LIMIT ".$this->builders->limit;
+        }        
+//        echo $this->query;
         $db = Config::getDb();
         if(!$cacheable){
             $cache = false;
@@ -395,7 +404,7 @@ class QueryBuilder {
         
         if($cache == "cached"){
             $db->Query("UPDATE cache SET result='".serialize($arr)."',timestamp='".date('Y-m-d H:i:s')."' WHERE key_sql='".md5($this->query)."'");
-        }
+        }        
         return $arr;
     }
     /**
@@ -517,6 +526,13 @@ class QueryBuilder {
         self::$queryhistory[] = $result;
         //print_r(self::$queryhistory);
     }    
+    public function limit($from,$to=""){
+        $this->builders->limit = $from;
+        if($to){
+            $this->builders->limit.=",$to";
+        }        
+        return $this;
+    }
     /**
      * Returns query history
      */

@@ -35,7 +35,7 @@ abstract class AbstractController extends Table{
      * Finds records by attributes
      * @param type $where
      */
-    public function findBy($where,$cacheable = true,$fields = "*"){
+    public function findBy($where,$cacheable = true,$fields = "*",$limit_from="",$limit_to=""){
         $find = $this->isInController($where);
         if($find !== false){
             return $this->rows[$find];
@@ -43,8 +43,8 @@ abstract class AbstractController extends Table{
         $this->wheredone[] = $where;
         if($where == "*"){
             $where = "";
-        }
-        $associative = parent::findBy($where,$cacheable,$fields);
+        }        
+        $associative = parent::findBy($where,$cacheable,$fields,$limit_from,$limit_to);
         //print_r($associative);
         $new_arr = $associative;
         /*foreach($associative as $key => $val){
@@ -135,5 +135,13 @@ abstract class AbstractController extends Table{
     }
     public function getRows(){
         return $this->findBy("*");
+    }
+    public function getterName($field){
+        $field_get = str_replace(" ","",ucwords(str_replace("_"," ",$field)));
+        return "get".$field_get;
+    }
+    public function setterName($field){
+        $field_set = str_replace(" ","",ucwords(str_replace("_"," ",$field)));
+        return "set".$field_set;
     }
 }

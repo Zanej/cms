@@ -350,13 +350,11 @@ class EntityCreator {
             $this->exclude[] = array("function"=>"public function set$nome_colonna_setter","num_rows"=>"3");
         }
         for($i=count($this->rowstoexclude)-1;$i>=0;$i--){
-            if(trim($this->rowstoexclude[$i]["content"]) == "}"){
-                
+            if(trim($this->rowstoexclude[$i]["content"]) == "}"){                
                 unset($this->rowstoexclude[$i]);
                 break;
             }
         }
-        //print_r($this->exclude);
         foreach($this->rowstoexclude as $chiave => $riga){
             foreach($this->exclude as $escludi){
                 if(strstr($riga["content"],$escludi["function"])){

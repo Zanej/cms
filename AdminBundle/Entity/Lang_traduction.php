@@ -18,6 +18,14 @@
          */
         protected $id_lang;
         /**
+         *@var varchar(255)
+         *@key No traduzioni duplicate|UNIQUE
+         *@default 
+         *@extra 
+         *@nullable NO
+         */
+        protected $key_name;
+        /**
          *@var varchar(1000)
          *@default 
          *@extra 
@@ -44,6 +52,9 @@
         public function setIdLang($id_lang){
             $this->id_lang=$id_lang;
         }
+        public function setKeyName($key_name){
+            $this->key_name=$key_name;
+        }
         public function setTraduction($traduction){
             $this->traduction=$traduction;
         }
@@ -58,6 +69,9 @@
         }
         public function getIdLang(){
             return $this->id_lang;
+        }
+        public function getKeyName(){
+            return $this->key_name;
         }
         public function getTraduction(){
             return $this->traduction;

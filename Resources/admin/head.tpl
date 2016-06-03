@@ -1,7 +1,9 @@
+<!--FONT AWESOME-->
+<link rel="stylesheet" href="/admin/assets/css/font-awesome/css/font-awesome.min.css"/>
 <!-- CSS-->
-<link rel="stylesheet" href="/admin/assets/CSS/style.css"/>
+<link rel="stylesheet" href="/admin/assets/css/style.css"/>
 <!-- Montserrat-->
-<link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 <!--Slick-->
 <link rel="stylesheet" href="/admin/assets/css/slick/slick.css"/>
 <link rel="stylesheet" href="/admin/assets/css/slick/slick-theme.css"/>

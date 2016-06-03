@@ -91,5 +91,23 @@ abstract class AbstractDbElement extends DbElement{
             }
         }
     }
+    /**
+     * 
+     * @param type $field
+     * @return type
+     */
+    public function getterName($field){
+        $field_get = str_replace(" ","",ucwords(str_replace("_"," ",$field)));
+        return "get".$field_get;
+    }
+    /**
+     * 
+     * @param type $field
+     * @return type
+     */
+    public function setterName($field){
+        $field_set = str_replace(" ","",ucwords(str_replace("_"," ",$field)));
+        return "set".$field_set;
+    }
     
 }

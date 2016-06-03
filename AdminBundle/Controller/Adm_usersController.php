@@ -14,7 +14,7 @@
                 $user = explode("|",$_COOKIE["authenticate_user"]);
                 $db = Conf::getDB();
                 
-                $res = $db->Query("SELECT id FROM adm_users WHERE md5(username)='".$user[0]."' AND password='".$user[1]."'");                
+                $res = $db->Query("SELECT id FROM adm_users WHERE md5(username)='".$user[0]."' AND password='".$user[1]."' LIMIT 1");                
                 if(!$res){
                     return false;
                 }
@@ -26,8 +26,8 @@
                 return false;
             }
             $user = explode("|",$_COOKIE["authenticate_user"]);
-            $username = $user[0];
-            $user = $this->findBy(array("md5(username)"=>$username),false);
+            $username = $user[0];            
+            $user = $this->findBy(array("md5(username)"=>$username),false,"*",1);
             return $user[0];
         }
         public function loginAction(){            

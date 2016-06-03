@@ -50,23 +50,45 @@ body {
 body .hamburger {
   z-index: 999999;
   position: fixed;
-  top: 5px;
-  left: 5px;
+  top: 0;
+  left: 10px;
   width: 30px;
   height: 30px;
-  background-image: url('/admin/assets/images/menu-alt.png');
-  background-size: 30px;
-  background-repeat: no-repeat;
-  -webkit-transition: width 300ms;
+  background-color: #18a689;
+  font-size: 20px;
+  color: white;
+  text-align: center;
+  -webkit-transition: all 300ms;
   /* Safari */
-  transition: width 300ms;
+  transition: all 300ms;
 }
 body .hamburger:hover {
   width: 50px;
-  background-size: 35px 30px;
+}
+body .hamburger.open {
+  left: 160px;
+}
+@media (max-width: 768px) {
+  body .hamburger.open {
+    left: 10px;
+    background-color: #f3f3f4;
+  }
+}
+@media (max-width: 768px) {
+  body .hamburger {
+    top: 5px;
+  }
+}
+@media (max-width: 768px) {
+  body .hamburger {
+    background-color: inherit;
+    color: black;
+  }
+}
+body .hamburger i {
+  margin-top: 5px;
 }
 body header {
-  background-color: #f3f3f4;
   height: 42px;
   width: 100%;
 }
@@ -113,6 +135,7 @@ body .contenitore {
   height: calc(100% - 42px);
 }
 body .contenitore .left {
+  top: 0;
   width: 150px;
   background-color: #f3f3f4;
   position: fixed;
@@ -186,6 +209,215 @@ body .contenitore .right {
 }
 body .contenitore .right.open {
   width: 100%;
+}
+body .contenitore .right .lista {
+  width: 90%;
+  margin: 0 5%;
+  display: table;
+  font-size: 14px;
+  margin-top: 20px;
+  border-top: 1px solid #e7eaec;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista {
+    background-color: #f3f3f4;
+    height: 100%;
+    width: 100%;
+    display: block;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    float: left;
+  }
+}
+body .contenitore .right .lista .table_header {
+  display: table-row;
+  margin: 15px 0;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .table_header {
+    float: left;
+    width: 100%;
+    display: none;
+  }
+}
+body .contenitore .right .lista .table_header .table_cell {
+  line-height: 1.5;
+  vertical-align: middle;
+  border-right: 1px solid #e7eaec;
+  font-weight: bold;
+  color: #676a6c;
+  padding: 10px 5px;
+  text-transform: uppercase;
+  margin: 0;
+  display: table-cell;
+}
+body .contenitore .right .lista .table_header .table_cell:first-child {
+  border-left: 1px solid #e7eaec;
+}
+body .contenitore .right .lista .table_header .table_cell:last-child {
+  text-align: right;
+  padding-right: 20px;
+}
+body .contenitore .right .lista .element {
+  display: table-row;
+  background-color: #FFF;
+  transition: all 300ms;
+  -webkit-transition: all 300ms;
+  width: 100%;
+  margin: 10px 0;
+}
+body .contenitore .right .lista .element:hover {
+  outline: 1px solid #1ab394;
+}
+body .contenitore .right .lista .element:last-child .table_cell {
+  border-bottom: 1px solid #e7eaec;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element {
+    display: block;
+    float: left;
+    width: 95%;
+    margin: 5px 2.5%;
+    background-image: url('/admin/assets/images/arrow_down_group.png');
+    background-position: top right;
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+  }
+  body .contenitore .right .lista .element.open {
+    background-image: url('/admin/assets/images/arrow_up_group.png');
+    padding-bottom: 20px;
+  }
+  body .contenitore .right .lista .element.open .table_cell {
+    display: block;
+  }
+}
+body .contenitore .right .lista .element .title {
+  display: none;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .title {
+    padding: 10px 0;
+    text-align: center;
+    display: block;
+  }
+}
+body .contenitore .right .lista .element .table_cell {
+  color: #676a6c;
+  display: table-cell;
+  line-height: 1.5;
+  vertical-align: top;
+  min-height: 40px;
+  border: 1px solid #e7eaec;
+  border-bottom: 0;
+  border-left: 0;
+  padding: 5px;
+  margin: 0 2%;
+  transition: all 300ms;
+  -webkit-transition: all 300ms;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .table_cell {
+    border-left: 1px solid #e7eaec;
+  }
+}
+body .contenitore .right .lista .element .table_cell:nth-child(2) {
+  border-left: 1px solid #e7eaec;
+}
+body .contenitore .right .lista .element .table_cell:last-child {
+  text-align: right;
+  padding-right: 20px;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .table_cell:last-child {
+    border-bottom: 1px solid #e7eaec;
+    text-align: left;
+    padding-right: 0;
+  }
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .table_cell {
+    float: left;
+    width: 95%;
+    margin: 0 2.5%;
+    padding: 0;
+    border-right: 1px solid #e7eaec;
+    display: none;
+  }
+}
+body .contenitore .right .lista .element .table_cell .label {
+  display: none;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .table_cell .label {
+    float: left;
+    width: 30%;
+    display: block;
+    min-height: 40px;
+  }
+}
+body .contenitore .right .lista .element .table_cell .value {
+  min-height: 40px;
+  word-break: break-word;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .table_cell .value {
+    float: right;
+    display: inline-block;
+    width: auto;
+    width: 100%;
+    text-align: right;
+    max-width: 65%;
+    margin-right: 4%;
+  }
+}
+body .contenitore .right .lista .element .table_cell .op {
+  text-align: center;
+  width: 40px;
+  height: 35px;
+  border-radius: 5px;
+  display: inline-block;
+}
+body .contenitore .right .lista .element .table_cell .op.edit {
+  background-color: skyblue;
+}
+body .contenitore .right .lista .element .table_cell .op.lock {
+  background-color: darkorange;
+}
+body .contenitore .right .lista .element .table_cell .op.unlock {
+  background-color: #1ab394;
+}
+body .contenitore .right .lista .element .table_cell .op.delete {
+  background-color: #ed5565;
+}
+body .contenitore .right .lista .element .table_cell .op .label_op {
+  display: none;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .table_cell .op .label_op {
+    width: 100%;
+    line-height: 35px;
+    display: block;
+    color: white;
+  }
+}
+body .contenitore .right .lista .element .table_cell .op i {
+  color: white;
+  font-size: 15px;
+  line-height: 35px;
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .table_cell .op i {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  body .contenitore .right .lista .element .table_cell .op {
+    width: 49%;
+    margin: 5px 0;
+  }
 }
 body#login .left {
   width: 0;

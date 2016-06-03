@@ -9,3 +9,7 @@ view_sezioni_admin:
     path:/admin/sezioni/{$sezione}
     rules:(^[0-9]+)
     page:CMS\AdminBundle\Controller\SezioniController\showAction
+view_sezioni_admin_page:
+    path:/admin/sezioni/{$sezione}/page/{$page}
+    rules:(^[0-9]+)
+    page:CMS\AdminBundle\Controller\SezioniController\showAction
