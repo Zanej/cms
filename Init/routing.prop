@@ -11,5 +11,13 @@ view_sezioni_admin:
     page:CMS\AdminBundle\Controller\SezioniController\showAction
 view_sezioni_admin_page:
     path:/admin/sezioni/{$sezione}/page/{$page}
-    rules:(^[0-9]+)
+    rules:(^[0-9]+)(^[0-9]+)
     page:CMS\AdminBundle\Controller\SezioniController\showAction
+view_scheda_admin_insert:
+    path:/admin/sezioni/{$sezione}/insert
+    rules:(^[0-9+])
+    page:CMS\AdminBundle\Controller\SezioniController\insertAction
+view_scheda_admin_edit:
+    path:/admin/sezioni/{$sezione}/edit/{$id}
+    rules:(^[0-9+])(^[0-9+])
+    page:CMS\AdminBundle\Controller\SezioniController\editAction

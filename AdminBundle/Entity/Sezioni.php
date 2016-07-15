@@ -111,6 +111,27 @@
          *@nullable YES
          */
         protected $livello;
+        
+        private $controller;
+        private $ct_controller;
+        private $campi;
+        private $chiave;
+        private $from;
+        public function __construct($id, $params = "*",$from="") {
+            parent::__construct($id, $params);            
+            $this->from = "";
+            /*@var $controller_conf Conf_tableController*/
+            if($from == "scheda"){
+                $this->from="view_admin";
+            }elseif($from == "frontend"){
+                $this->from="view_frontend";
+            }elseif($from == "lista"){
+                $this->from="view_lista";
+            }
+            $this->ct_controller = new Conf_tableController(); 
+            $this->initFields();
+                                   
+        }
         public function setId($id){
             $this->id=$id;
         }
@@ -201,49 +222,63 @@
         public function getLivello(){
             return $this->livello;
         }
-        public function getCampi($from="",$controller=false){
-            /*@var $controller_conf Conf_tableController*/
-            if($from == "scheda"){
-                $addfrom="view_admin";
-            }elseif($from == "frontend"){
-                $addfrom="view_frontend";
-            }elseif($from == "lista"){
-                $addfrom="view_lista";
-            }
-            if(!$controller){                
-                $controller_conf = new Conf_tableController();            
+        public function initFields(){
+            if($this->from){
+                $this->campi = $this->ct_controller->findBy(array("id_sezione"=>$this->getId(),$this->from=>1));                                
             }else{
-                $controller_conf = $controller;
-            }
-            if($addfrom){
-                $campi = $controller_conf->findBy(array("id_sezione"=>$this->getId(),$addfrom=>1));
-            }else{
-                $campi = $controller_conf->findBy(array("id_sezione"=>$this->getId()));
-            }
+                $this->campi = $this->ct_controller->findBy(array("id_sezione"=>$this->getId()));                
+            }            
             $chiave_titolo = false;
-            if($campi == false){                       
+            if(!isset($this->table)){
+                /*@var $controller_obj AbstractController*/
+                $this->controller = new $this->object();
+                $this->chiave = \CMS\Conf\Config::getDB()->getPrimaryKey($this->controller->getTableName());    
+            }else{
+                $this->chiave = \CMS\Conf\Config::getDB()->getPrimaryKey($this->table);                                                                                
+            }
+            if($this->campi == false){                       
                 if(isset($this->table)){                    
-                    $campi =  \CMS\Conf\Config::getDB()->GetColumnNames($this->table);
-                    $chiave = \CMS\Conf\Config::getDB()->getPrimaryKey($this->table);                                                                                
-                }else{
-                    /*@var $controller_obj AbstractController*/
-                    $controller_obj = new $this->object();                    
-                    $chiave = \CMS\Conf\Config::getDB()->getPrimaryKey($controller_obj->getTableName());    
-                    $campi =  \CMS\Conf\Config::getDB()->GetColumnNames($controller_obj->getTableName());
+                    $this->campi =  \CMS\Conf\Config::getDB()->GetColumnNames($this->table);                    
+                }else{                                                                
+                    $this->campi =  \CMS\Conf\Config::getDB()->GetColumnNames($this->controller->getTableName());
                 }
-                $chiave_titolo = true;
-            }
-            foreach($campi as $kk => $vv){
-                $campi[$kk] = array("name"=>$vv,"hidden"=>false,"key"=>false);
-                if($kk == $chiave){
-                    $campi[$kk]["hidden"] = true;
-                    $campi[$kk]["key"] = true;
-                    if($chiave_titolo){
-                        $campi[$kk]["titolo"] = true;
+                $chiave_titolo = true;            
+                foreach($this->campi as $kk => $vv){
+                    $this->campi[$kk] = array("field"=>$vv,"hidden"=>false,"key"=>false);
+                    if($kk == $this->chiave){
+                        $this->campi[$kk]["hidden"] = true;
+                        $this->campi[$kk]["key"] = true;
+                        if($chiave_titolo){
+                            $this->campi[$kk]["titolo"] = true;
+                        }
                     }
-                }
+                    $this->campi[$kk] = (Object) $this->campi[$kk];                    
+                    $this->campi[$kk]= new \CMS\Controller\AbstractStdClass(get_object_vars($this->campi[$kk]));                    
+                }                                
             }
-            return $campi;
+            foreach($this->campi as $kk => $vv){
+                $this->getExternalValues($this->campi[$kk]);
+            }            
+        }
+        /**
+         * 
+         * @param type $object
+         */
+        public function getExternalValues(&$object){            
+            if($object->get("table")){
+                $qb = new QueryBuilder();
+                $object->values = $qb->select($object->get("table"), "*")->getResult(false);      
+                foreach($object->values as $k => $v){
+                    $v = (Object) $v;
+                    $object->values[$k] = new \CMS\Controller\AbstractStdClass(get_object_vars($v));
+                }                
+            }elseif($object->get("object")){
+                $controller = new $object->get("object");
+                $object->values = $controller->findBy("");
+            }
+        }
+        public function getCampi(){            
+            return $this->campi;
         }
         /**
          * 
@@ -253,27 +288,30 @@
          * @return type
          */
         public function getRows($type="",$filter="",$page=""){
-            /*@var $controller_conf Conf_tableController*/
-            $controller_conf = new Conf_tableController();
-            $campi_r = $this->getCampi($type,$controller_conf);
+            /*@var $controller_conf Conf_tableController*/            
+            $campi_r = $this->getCampi($type);
             foreach($campi_r as $k => $v){
-                $campi[] = $v["name"];
-            }
+                if(is_object($v)){
+                    $campi[] = $v->get("field"); 
+                }else{
+                    $campi[] = $v["field"];
+                }
+            }            
             if($page > 1){
                 $limit_from = (($page+1)*$this->getPerPage());
                 $limit_to = $this->getPerPage();
             }elseif($page == 1){
                 $limit_from = 0;
                 $limit_to = $this->getPerPage();
-            }            
-            if(isset($this->object)){
-                $controller = new $this->object();
-                /*@var $controller AbstractController*/         
-                if($limit_from){
-                    $rows = $controller->findBy("",true,$campi,$limit_from,$limit_to);
+            }                        
+            if(isset($this->controller)){                                
+                /*@var $controller AbstractController*/                                    
+                if($limit_from){                    
+                    $rows = $this->controller->findBy($filter,true,$campi,$limit_from,$limit_to);                                        
                 }else{
-                    $rows = $controller->findBy("",true,$campi);
+                    $rows = $this->controller->findBy($filter,true,$campi);                                        
                 }                
+                
             }else{
                 $qb = new QueryBuilder();                
                 if($limit_from){
@@ -283,5 +321,16 @@
                 }
             }
             return $rows;
+        }
+        public function getEditLink($id_el){
+            if(is_object($id_el)){
+                $id = $id_el->getId();
+            }elseif(is_array($id_el)){                
+                $id = $id_el[$this->chiave];
+            }
+            return "/admin/sezioni/".$this->getId()."/edit/".$id;
+        }
+        public function getChiave(){
+            return $this->chiave;
         }
     }

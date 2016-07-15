@@ -4,7 +4,7 @@
 {/block}
 {block name="content"}
     <div class="form_container">
-        <form action="" method="POST" data-validate>
+        <form action="" method="POST" data-validate data-submitter="#submitter" data-change>
             <div class="input_box">
                 <label for="nome">Nome</label>
                 <div class="text_box">                    
@@ -35,7 +35,7 @@
                     <label for="privacy">Privacy</label>
                 </div>
             </div>
-            <input type="button" value="INVIA!"/>
+            <input type="button" value="INVIA!" id="submitter"/>
             <!--<div class="input_box">
                 <div class="text_box">
                     <label for="nome">Nome</label>

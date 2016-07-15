@@ -27,7 +27,7 @@ class Route {
         }
         if($where == 0 && $url != "" && $prefix != $route){
             return false;
-        }
+        }        
         if($prefix == $route){            
             return true;
         }else{
@@ -39,7 +39,7 @@ class Route {
             }
             $keys = substr($route,$where);
             $params = substr($url,$where);      
-            $values = self::getUrlParams($params, $keys);       
+            $values = self::getUrlParams($params, $keys);                   
             if(count($values) > 0){                
                 return $values;
             }else{
@@ -63,6 +63,14 @@ class Route {
         $search_c = explode("/",$val_e);
         if(count($search) != count($search_c)){
             return false;
+        }
+        foreach($search_c as $ks => $vs){
+            if(strpos($vs,"{") !== false && strpos($vs,"}")){
+                continue;
+            }
+            if($search[$ks] != $vs){                
+                return array();
+            }
         }        
         for($j=0;$j<strlen($exafterurl);$j++){
             $pos_graf = strpos($exafterurl,"{",$j);

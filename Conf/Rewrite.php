@@ -199,9 +199,14 @@ if( $check_equal && COUNT($_POST) > 0){
 }elseif($check){    
     $controller->loginAction();    
 }else{
+
     $url = $_GET["url"];        
-    $page = str_replace("//","/",$_SERVER["DOCUMENT_ROOT"]."/".$_GET["url"]);           
-    if(file_exists($page)){
+    $page = str_replace("//","/",$_SERVER["DOCUMENT_ROOT"]."/web/".$_GET["url"]);           
+
+    //echo $page;
+
+    if(file_exists($page)){        
+
         require_once($page);
         exit;
     }else{

@@ -114,24 +114,34 @@ abstract class AbstractController extends Table{
      * @param type $params parametri
      */
     public function render($templatename,$params){
-        if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl")){
-            throw new \Exception("Template not found!");
-        }else{
-            $filename = $_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl";
-        }        
-        //echo $filename;
-        /* @var CMS\Conf\Smarty $smarty*/
-        $smarty = Config::getSmarter();
-        //print_r($params);
-        //exit;
-        $smarty->assign("COOKIE",$_COOKIE);
-        $smarty->assign("SESSION",$_SESSION);
-        $smarty->assign("GET",$_GET);
-        $smarty->assign("POST",$_POST);
-        foreach($params as $key => $val){            
-            $smarty->assign($key,$val);
-        }        
-        $smarty->display(str_replace("//","/",$filename));
+
+        try{
+            if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl")){
+                throw new \Exception("Template not found!");
+            }else{
+                $filename = $_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl";
+            }        
+            //echo $filename;
+            /* @var CMS\Conf\Smarty $smarty*/
+            $smarty = Config::getSmarter();
+            //print_r($params);
+            //exit;
+            $smarty->assign("COOKIE",$_COOKIE);
+            $smarty->assign("SESSION",$_SESSION);
+            $smarty->assign("GET",$_GET);
+            $smarty->assign("POST",$_POST);
+            
+
+            foreach($params as $key => $val){
+
+                $smarty->assign($key,$val);
+            }
+
+            $smarty->display(str_replace("//","/",$filename));
+        }catch(\Exception $e){
+
+            echo "Caught exception: ".$e->getMessage();
+        }
     }
     public function getRows(){
         return $this->findBy("*");

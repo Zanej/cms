@@ -105,7 +105,7 @@
             }else{
                $sql.= $this->key." = '".$id_query."'";
             }
-            //echo $sql;
+            #echo $sql;
             $result = $db->QuerySingleRowArray($sql,MYSQL_ASSOC);
             $this->params = $result;
             foreach($result as $key => $val){

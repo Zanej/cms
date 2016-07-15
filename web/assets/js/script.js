@@ -1,4 +1,7 @@
-var valida = new Validator([
+var valida;
+
+$(document).ready(function(){
+    valida = new Validator([
         "#form_test"
     ],{
         campo_obbligatorio:"Campo obbligatorio!",
@@ -19,7 +22,7 @@ var valida = new Validator([
             console.log("error form!!");
         },
         particular_fields:[{
-            field:"input[type='text']",
+            field:"input[type='text']",            
             error:function(){
                 console.log("error text!");
             },
@@ -44,12 +47,4 @@ var valida = new Validator([
             }
         }]
     });
-$(document).on("click","form input[type='button']",function(e){
-   e.preventDefault();
-   valida.doValidation($(this).parents("form")); 
-   return false;
-});
-$(document).on("change","form input,form select,form textarea",function(e){
-    valida.checkField($(this));
-});
-
+})

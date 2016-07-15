@@ -82,22 +82,24 @@
         public function findBy($where,$cacheable = true,$fields="*",$limit_from="",$limit_to=""){
             /*if(is_array($fields)){
                 $fields = implode(",",$fields);
-            }*/
+            }*/            
+            #exit;
             if($limit_from){               
                 $arr = $this->querybuilder->select($this->name,$fields,$where)->limit($limit_from,$limit_to)->getResult($cacheable);            
-            }else{
+            }else{                
                 $arr = $this->querybuilder->select($this->name,$fields,$where)->getResult($cacheable);            
-            }
+            }            
+            
             if(is_array($arr) && count($arr) > 0){
                 foreach($arr as $key => $val){
                     $classe = get_class($this);
                     $namespace_fk = substr($classe,0,strrpos($classe,"\\"));
                     $namespace = substr($namespace_fk,0,strrpos($namespace_fk,"\\"))."\Entity\\";
                     $nome_classe = $namespace.ucfirst($this->name);
-                    if(!class_exists($nome_classe)){
-                        $arr[$key] = new DbElement($val[$this->key],"*",$this->key,$this->name);
-                    }else{
-                        $arr[$key] = new $nome_classe($val[$this->key],"*");
+                    if(!class_exists($nome_classe)){                        
+                        $arr[$key] = new DbElement($val[$this->key],$fields,$this->key,$this->name);
+                    }else{ 
+                        $arr[$key] = new $nome_classe($val[$this->key],$fields);                        
                     }
 
                 }

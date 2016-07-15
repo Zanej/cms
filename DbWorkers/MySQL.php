@@ -524,7 +524,7 @@ class MySQL
 	public function GetColumnCount($table = "") {
 		$this->ResetError();
 		if (empty($table)) {
-			$result = $this->mysql_link->num_fields($this->last_result);
+			$result = $this->last_result->field_count;
 			if (! $result) $this->SetError();
 		} else {
 			$records = $this->mysql_link->query("SELECT * FROM " . $table . " LIMIT 1");
@@ -800,9 +800,9 @@ class MySQL
 	public function GetColumnNames($table = "") {
 		$this->ResetError();
 		if (empty($table)) {
-			$columnCount = $this->mysql_link->num_fields($this->last_result);
+			$columnCount = $this->last_result->field_count;
             //echo $columnCount;
-			if (! $columnCount) {
+			if (! $columnCount) {   
 				$this->SetError();
 				$columns = false;
 			} else {
