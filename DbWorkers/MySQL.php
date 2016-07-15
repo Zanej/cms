@@ -363,7 +363,30 @@ class MySQL
 			}
 		}
 	}
-
+    /**
+     * Returns all the foreign keys in a table
+     * @param type $table_name Table name
+     * @return type
+     */
+    public function getForeignKeys($table_name){
+        $sql = "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME";
+        $sql.=",REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
+        $sql.=" WHERE TABLE_SCHEMA = '".$this->db_dbname."' AND ";
+        $sql.=" TABLE_NAME='$table_name' and REFERENCED_TABLE_NAME IS NOT NULL";
+        return $this->QueryArray($sql);
+    }
+    /**
+     * Returns the primary key of a table
+     * @param type $table_name
+     */
+    public function getPrimaryKey($table_name){
+        $sql = "SHOW KEYS FROM $table_name WHERE Key_name = (";
+        $sql.= "SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS";
+        $sql.= " WHERE CONSTRAINT_SCHEMA = '".$this->db_dbname."' AND table_name='$table_name'";
+        $sql.=" AND constraint_type='primary key' )";
+        $arr = $this->QuerySingleRowArray($sql);
+        return $arr["Column_name"];
+    }
 	/**
 	 * Returns true if the internal pointer is at the end of the records
 	 *
@@ -501,7 +524,7 @@ class MySQL
 	public function GetColumnCount($table = "") {
 		$this->ResetError();
 		if (empty($table)) {
-			$result = $this->mysql_link->num_fields($this->last_result);
+			$result = $this->last_result->field_count;
 			if (! $result) $this->SetError();
 		} else {
 			$records = $this->mysql_link->query("SELECT * FROM " . $table . " LIMIT 1");
@@ -519,17 +542,15 @@ class MySQL
 		}
 		return $result;
 	}
-   private function mysqli_field_type( $result , $field_offset ) {
-    static $types;
-
-    $type_id = mysqli_fetch_field_direct($result,$field_offset)->type;
-
-    if (!isset($types))
-    {
-        $types = array();
-        $constants = get_defined_constants(true);
-        foreach ($constants['mysqli'] as $c => $n) if (preg_match('/^MYSQLI_TYPE_(.*)/', $c, $m)) $types[$n] = $m[1];
-    }
+    private function mysqli_field_type( $result , $field_offset ) {
+        static $types;
+        #print_r($result);
+        $type_id = mysqli_fetch_field_direct($result,$field_offset)->type;
+        if (!isset($types)){
+            $types = array();
+            $constants = get_defined_constants(true);
+            foreach ($constants['mysqli'] as $c => $n) if (preg_match('/^MYSQLI_TYPE_(.*)/', $c, $m)) $types[$n] = $m[1];
+        }
 
     return array_key_exists($type_id, $types)? $types[$type_id] : NULL;
 }
@@ -557,7 +578,8 @@ class MySQL
 		} else {
 			if (is_numeric($column)) $column = $this->GetColumnName($column, $table);
 			$result = $this->mysql_link->query("SELECT " . $column . " FROM " . $table . " LIMIT 1");
-			if ($this->mysql_link->field_count($result) > 0) {
+            //echo "SELECT " . $column . " FROM " . $table . " LIMIT 1";
+			if ($this->mysql_link->field_count > 0) {
 				return $this->mysqli_field_type($result, 0);
 			} else {
 				$this->SetError("The specified column or table does not exist, or no data was returned", -1);
@@ -575,23 +597,54 @@ class MySQL
         return $res["Type"];
     }
     /**
-     * Returns whether a column is a key
+     * Returns if a column is referenced by another
+     */
+    public function isReferencedColumn($column,$table){
+        $sql = "SELECT TABLE_NAME,COLUMN_NAME ";
+        $sql.= " FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
+        $sql.=" WHERE TABLE_SCHEMA = '".$this->db_dbname."' AND ";
+        $sql.=" REFERENCED_TABLE_NAME='$table' AND REFERENCED_COLUMN_NAME='$column'";
+        return $this->QuerySingleRowArray($sql, MYSQL_ASSOC);
+    }
+    /**
+     * Returns references table and columns of a foreign key
      * @param $column Column
      * @param $table Table
      */
-    public function IsColumnKey($column,$table){
-        $res = $this->QueryArray("SHOW KEYS FROM $table WHERE Column_name='$column'",MYSQL_ASSOC);
-        //print_r($res);
-        if(count($res) > 0){
-            $ret = "";
-            foreach($res as $key => $val){
-                echo $val["Key_name"];
-                $ret.=$val["Key_name"].",";
+    public function getForeignKeyReference($column,$table){
+        $sql = "SELECT REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME ";
+        $sql.= " FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
+        $sql.=" WHERE TABLE_SCHEMA = '".$this->db_dbname."' AND ";
+        $sql.=" TABLE_NAME='$table' AND COLUMN_NAME='$column' AND ";
+        $sql.=" REFERENCED_TABLE_NAME IS NOT NULL";
+        return $this->QuerySingleRowArray($sql,MYSQL_ASSOC);
+    }
+    /**
+     * Returns all keys of a table
+     * @param $table table name
+     */
+    public function getAllKeys($table){
+        $sql="SELECT CONSTRAINT_NAME,CONSTRAINT_TYPE FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS";
+        $sql.=" WHERE CONSTRAINT_SCHEMA = '".$this->db_dbname."' AND table_name='$table'";
+        //echo $sql;
+        $arr = $this->QueryArray($sql,MYSQL_ASSOC);
+        foreach($arr as $key => $val){
+            $sql="SHOW KEYS FROM $table WHERE Key_name='".$val["CONSTRAINT_NAME"]."'";
+            $chiave = $this->QuerySingleRowArray($sql,MYSQL_ASSOC);
+            $val["key_name"] = $val["CONSTRAINT_NAME"];
+            
+            if($val["CONSTRAINT_TYPE"] == "FOREIGN KEY"){
+                $infos = $this->getForeignKeyReference($chiave["Column_name"], $table);
+                $val["CONSTRAINT_TYPE"].="|".$infos["REFERENCED_TABLE_NAME"]."|".$infos["REFERENCED_COLUMN_NAME"];
             }
-            $ret = substr($ret,0,strlen($ret)-1);
-            return $ret;
+            $val["key_type"] = $val["CONSTRAINT_TYPE"];
+            unset($val["CONSTRAINT_NAME"]);
+            unset($val["CONSTRAINT_TYPE"]);
+            $arr[$chiave["Column_name"]] = $val;
+            unset($arr[$key]);
         }
-        return false;
+        //print_r($arr);
+        return $arr;
     }
     /**
      * Returns whether a column can be null
@@ -747,9 +800,9 @@ class MySQL
 	public function GetColumnNames($table = "") {
 		$this->ResetError();
 		if (empty($table)) {
-			$columnCount = $this->mysql_link->num_fields($this->last_result);
+			$columnCount = $this->last_result->field_count;
             //echo $columnCount;
-			if (! $columnCount) {
+			if (! $columnCount) {   
 				$this->SetError();
 				$columns = false;
 			} else {
@@ -1325,10 +1378,11 @@ class MySQL
 	 */
 	public function Release() {
 		$this->ResetError();
-		if (! $this->last_result) {
+		if (!$this->last_result) {
 			$success = true;
 		} else {
-			$success = $this->last_result->free();
+            $success = $this->mysql_link->close();
+			$this->mysql_link= new \mysqli("p:".$this->db_host,$this->db_user,$this->db_pass,$this->db_dbname);
 			if (! $success) $this->SetError();
 		}
 		return $success;
@@ -1881,7 +1935,7 @@ class MySQL
 			
 			// Execute the UPDATE
 			if (! $this->Query($sql)) {
-				echo $sql;	
+				//echo $sql;	
 				return false;
 				
 			} else {

@@ -2,21 +2,20 @@
     namespace CMS\DbWorkers;
     use \CMS\Conf\Config;
 	class Table{
-        private $fields;
         private $rows;
-        private $key;
+        protected $key;
         private $name;
-        private $return;
-        private $db;
+        private $querybuilder;
         /**
          * 
-         * @param type $name
-         * @param type $force
-         * @param type $get
-         * @param type $values
+         * @param string $name nome
+         * @param boolean $force if true creates the table if doesn't exist
+         * @param boolean $get returns row if true
+         * @param array $values if table has to be created, these are the fields to be inserted
          */
 		public function __construct($name,$force=false,$get=true,$values=null){
             $this->name = $name;
+            $this->querybuilder = new QueryBuilder();
 			if(is_null($values) && self::exists($name)){
                 $this->key = $this->getKey();
                 if($get){
@@ -41,15 +40,22 @@
             $query = "CREATE TABLE $name (";
             $query.="id INTEGER AUTO_INCREMENT PRIMARY KEY ,";
             foreach($values as $key => $val){
-                $query.=$key." ";
-                $add = explode("|",$val);
-                $query.=" ".$add[0]."(".$add[1].")".$add[2].",";
+                $query.="`".$key."` ".$val.",";
+                /*$add = explode("|",$val);
+                $query.=" ".$add[0]."(".$add[1].")".$add[2].",";*/
             }
             $query =substr($query,0,strlen($query)-1);
             $query.=")";
-            //echo $query;
+            if(strstr(strtolower($query),"references ")){
+                $query.=" ENGINE='InnoDB'";
+                Config::getDB()->Query("SET FOREIGN_KEY_CHECKS=1");
+            }
             if(Config::getDb()->Query($query)){
-                echo json_encode(array("success"=>true));
+                //echo json_encode(array("success"=>true));
+                return true;
+            }else{
+                //echo $query;
+                return false;
             }
         }
         /**
@@ -70,20 +76,58 @@
 		}
         /**
          * 
+         * @param type $where
+         * @param boolean $cacheable
+         */
+        public function findBy($where,$cacheable = true,$fields="*",$limit_from="",$limit_to=""){
+            /*if(is_array($fields)){
+                $fields = implode(",",$fields);
+            }*/            
+            #exit;
+            if($limit_from){               
+                $arr = $this->querybuilder->select($this->name,$fields,$where)->limit($limit_from,$limit_to)->getResult($cacheable);            
+            }else{                
+                $arr = $this->querybuilder->select($this->name,$fields,$where)->getResult($cacheable);            
+            }            
+            
+            if(is_array($arr) && count($arr) > 0){
+                foreach($arr as $key => $val){
+                    $classe = get_class($this);
+                    $namespace_fk = substr($classe,0,strrpos($classe,"\\"));
+                    $namespace = substr($namespace_fk,0,strrpos($namespace_fk,"\\"))."\Entity\\";
+                    $nome_classe = $namespace.ucfirst($this->name);
+                    if(!class_exists($nome_classe)){                        
+                        $arr[$key] = new DbElement($val[$this->key],$fields,$this->key,$this->name);
+                    }else{ 
+                        $arr[$key] = new $nome_classe($val[$this->key],$fields);                        
+                    }
+
+                }
+            }
+            return $arr;
+        }
+        /**
+         * 
          * @param type $params
          * @param type $where
          */
 		public function update($params,$where){
-			//$db_elem = new DbElement(
+			return $this->querybuilder->update($this->name,$params,$where)->getResult();
 		}
+        /**
+         * 
+         */
+        public function delete($where){
+            return $this->querybuilder->delete($this->name, $where)->getResult();
+        }
         /**
          * 
          * @param type $id
          * @param type $params
          */
         public function updateKey($id,$params){
-            $db_elem = new DbElement($id,$this->key,$this->key,$this->name);
-            $db_elem->update($params);
+            $db_elem = new DbElement($id,$params,$this->key,$this->name);
+            //$db_elem->update($params);
             return $db_elem->getResult();
         }
         /**
@@ -95,20 +139,46 @@
         private function setRows($what="*",$where="1=1",$join=""){
             if($what == "*" && $where == "1=1" && $join==""){
                 $arr = Config::getDb()->QueryArray("SELECT * FROM ".$this->name,MYSQLI_ASSOC);
-                print_r($arr);
                 foreach($arr as $key => $val){
-                    $classname= "CMS\Data\\".$this->name;
-                    $this->rows[$val[$this->key]] = new $classname($val[$this->key],"*",$this->key,strtolower($this->name));
+                    $classe = get_class($this);
+                    $namespace_fk = substr(get_class($this),0,strrpos($classe,"\\"));
+                    $namespace = substr($namespace_fk,0,strrpos($namespace_fk,"\\"))."\Entity\\";
+                    $classname= $namespace.ucfirst($this->name);
+                    $this->rows[$val[$this->key]] = new $classname($val[$this->key],"*");
                 }
             }
         }
         /**
          * 
+         * @return QueryBuilder object
          */
-        private function getKey(){
-           $arr = Config::getDb()->QuerySingleRow("SHOW KEYS FROM ".$this->name." WHERE Key_name='PRIMARY'");
-           return $arr->Column_name;
-           //echo $db->Error();
+        public function getQB(){
+            return $this->querybuilder;
+        }
+        /**
+         * 
+         */
+        public function getTableName(){
+            return $this->name;
+        }
+        /**
+         * Returns the primary key
+         */
+        protected function getKey(){
+            return Config::getDb()->getPrimaryKey($this->name);
+        }
+        
+        /**
+         * Returns all the foreign keys of this table
+         */
+        private function getForeignKeys(){
+            return Config::getDb()->getForeignKeys($this->name);
+        }
+        /**
+         * Returns all keys of this table
+         */
+        private function getAllKeys(){
+            return Config::getDb()->getAllKeys($this->name);
         }
 	}
 ?>

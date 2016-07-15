@@ -1,5 +1,5 @@
 RewriteEngine on
-RewriteCond %{REQUEST_URI} !/Conf/Rewrite.php
-#RewriteCond %{REQUEST_FILENAME} !-d
-#RewriteCond %{REQUEST_FILENAME} !-f
+###NORMAL###
+RewriteCond %{REQUEST_URI} !/Conf/Rewrite.php$  
+RewriteCond %{REQUEST_URI} !\.(jpg|png|css|js|map)$
 RewriteRule ^(.*)$ /Conf/Rewrite.php?url=$1 [L,QSA]
