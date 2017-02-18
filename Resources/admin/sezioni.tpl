@@ -100,18 +100,39 @@
                             </div>
                             <i class="fa fa-edit"></i>
                         </a><!--edit-->
-                        <div class="op unlock">
-                            <div class="label_op">
-                                Sblocca
-                            </div>
-                            <i class="fa fa-unlock"></i>
-                        </div><!--unlock-->
-                        <div class="op lock">
-                            <div class="label_op">
-                                Blocca
-                            </div>
-                            <i class="fa fa-lock"></i>
-                        </div><!--lock-->
+                        {if is_object($v)}
+                            {if $v->get('stato') == '0' && $v->get('stato') != ''}
+                                <div class="op unlock" data-id="{$v->getId()}" data-sezione="{$sezione->getId()}">
+                                    <div class="label_op">
+                                        Sblocca
+                                    </div>
+                                    <i class="fa fa-unlock"></i>
+                                </div><!--unlock-->
+                            {elseif $v->get('stato') == '1'}
+                                <div class="op lock" data-id="{$v->getId()}" data-sezione="{$sezione->getId()}">
+                                    <div class="label_op">
+                                        Blocca
+                                    </div>
+                                    <i class="fa fa-lock"></i>
+                                </div><!--lock-->
+                            {/if}
+                        {else}
+                            {if $v.stato == '0' && $v.stato != ''}
+                                <div class="op unlock" data-id="{$v[$sezione->getChiave()]}" data-sezione="{$sezione->getId()}">
+                                    <div class="label_op">
+                                        Sblocca
+                                    </div>
+                                    <i class="fa fa-unlock"></i>
+                                </div><!--unlock-->
+                            {elseif $v.stato == '1'}
+                                <div class="op lock" data-id="{$v[$sezione->getChiave()]}" data-sezione="{$sezione->getId()}">
+                                    <div class="label_op">
+                                        Blocca
+                                    </div>
+                                    <i class="fa fa-lock"></i>
+                                </div><!--lock-->
+                            {/if}
+                        {/if}
                         <div class="op delete">
                             <div class="label_op">
                                 Elimina

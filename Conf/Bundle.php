@@ -37,7 +37,9 @@ class Bundle {
                     $result = Tab::create($nome,$campi);
                 }else{
                     $result = true;
+                    $nome = $campi;
                 }
+                
                 if($result){
                     $this->createController($nome);
                     $this->createEntity($nome);                    

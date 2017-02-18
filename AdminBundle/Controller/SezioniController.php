@@ -75,6 +75,10 @@
 
         public function showAction($sezione,$page=""){
             $sezione = new Sezioni($sezione,"*","lista");  
+
+//            $this->echo_array($sezione,1);
+            if(is_null($sezione->getId()))
+                exit("Not allowed");
             $user = new Adm_usersController();
             $username = $user->getUserLogged();
             if($page){
@@ -85,8 +89,10 @@
             $campi_hidden = array();
             $titolo_field = "";
 
+            // $this->echo_array($lista,1);
             $campi = $this->formalizzaCampi($sezione->getCampi("lista"),$titolo_field,$campi_hidden);
             
+            // $this->echo_array($campi,1);
             $lista_arr = array();
 
             
@@ -105,6 +111,24 @@
             return $this->render("admin/scheda",array("sezione"=>$sezione,"user"=>$username));
         }
 
+        public function echo_array($array,$exit = 0,$comment = 0){
+
+            if($comment == 1){
+                echo "<!--";
+            }
+
+            echo "<pre>";
+                print_r($array);
+            echo "</pre>";
+
+            if($comment == 1){
+                echo "-->";
+            }
+
+            if($exit == 1){
+                exit;
+            }
+        }
         public function editAction($sezione,$id){
             $sezione = new Sezioni($sezione,"*","scheda");  
             $user = new Adm_usersController();
@@ -114,7 +138,8 @@
             $campi = $this->formalizzaCampi($sezione->getCampi("scheda"));
 
             $object = $sezione->getRows("scheda",array($sezione->getChiave()=>$id),"1");
-            #print_r($campi);
+
+            // $this->echo_array($campi,1);
 
             return $this->render("admin/scheda",array("sezione"=>$sezione,"user"=>$username,"id"=>$id,"object"=>$object[0],"campi"=>$campi));
         }

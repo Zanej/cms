@@ -2,7 +2,9 @@
    namespace CMS\View;
    use CMS\Conf\Bundle;
    $nome = "ordini";
-   $bundle = new Bundle("Admin", array("conf_table","languages","lang_traduction"),1);
+   echo "A";
+   #$bundle = new Bundle("Task", array("task","task_comments","task_users","task_notifications","task_teams","cms_lang"),1);   
+//   $bundle = new Bundle("Task", array("cms_lang"),1);
    /*$bundle->createController("box");
    $bundle->createController("gruppi_sezioni");
    $bundle->createController("sezioni");
