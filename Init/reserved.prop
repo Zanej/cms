@@ -1,0 +1,20 @@
+admin_dir:
+    path:admin/
+    controller:CMS\AdminBundle\Controller\Adm_usersController
+    cookie_name:authenticate_user
+    separator:|
+    method:md5    
+    login_action:loginAction
+    login_check:exists
+    index_action:dashboardAction
+    session_name:admin_user
+task_dir:
+    path:task/
+    controller:CMS\TaskBundle\Controller\Task_usersController
+    cookie_name:task_user
+    separator:|
+    method:md5
+    login_action:loginAction
+    login_check:exists
+    index_action:indexAction
+    session_name:task_user
