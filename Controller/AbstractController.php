@@ -116,10 +116,10 @@ abstract class AbstractController extends Table{
     public function render($templatename,$params){
 
         try{
-            if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl")){
+            if(!file_exists($_SERVER["DOCUMENT_ROOT"]."/Resources/".$templatename.".tpl")){
                 throw new \Exception("Template not found!");
             }else{
-                $filename = $_SERVER["DOCUMENT_ROOT"]."/Resources/$templatename.tpl";
+                $filename = $_SERVER["DOCUMENT_ROOT"]."/Resources/".$templatename.".tpl";
             }        
             //echo $filename;
             /* @var CMS\Conf\Smarty $smarty*/
@@ -131,7 +131,6 @@ abstract class AbstractController extends Table{
             $smarty->assign("GET",$_GET);
             $smarty->assign("POST",$_POST);
             
-
             foreach($params as $key => $val){
 
                 $smarty->assign($key,$val);

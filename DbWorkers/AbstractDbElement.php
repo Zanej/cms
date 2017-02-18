@@ -21,14 +21,18 @@ abstract class AbstractDbElement extends DbElement{
      * @param type $params
      */
     public function __construct($id,$params="*"){
+
         $this->qb = new QueryBuilder();        
-        $this_table = strtolower(substr(get_class($this),strrpos(get_class($this),"\\")+1));              
-        $this_class = get_class($this);        
+        $this_table = strtolower(substr(get_class($this),strrpos(get_class($this),"\\")+1));                     
+        $this_class = get_class($this);                
         $pos_first = strpos($this_class,"\\");
         $pos_second = strpos($this_class,"\\",$pos_first+1);        
         $name = "\\".substr($this_class,0,$pos_second);
-        $name.="\Controller\\".substr($this_class,strrpos($this_class,"\\")+1)."Controller";           
-        $key_name = $name::getKeyName();        
+        $name.="\Controller\\".substr($this_class,strrpos($this_class,"\\")+1)."Controller";               
+        $key_name = $name::getKeyName(); 
+        
+        $this->key_name = $key_name;                
+
         parent::__construct($id,$params,$key_name,$this_table);
     }
     /**
@@ -36,13 +40,8 @@ abstract class AbstractDbElement extends DbElement{
      * @return type
      */
     public function getKeyName(){
-        $this_class = get_class($this);        
-        $pos_first = strpos($this_class,"\\");
-        $pos_second = strpos($this_class,"\\",$pos_first+1);        
-        $name = "\\".substr($this_class,0,$pos_second);
-        $name.="\Controller\\".substr($this_class,strrpos($this_class,"\\")+1)."Controller";        
-        /* @var AbstractController $name*/
-        return $name::getKeyName();
+
+        return $this->key;
     }
     /**
      * Creates a new Element
@@ -82,15 +81,22 @@ abstract class AbstractDbElement extends DbElement{
                 unset($vars[$key]);
             }
         }                
+
         if(count($vars) == 0){
             $this->return["success"] = true;
         }else{
-            $variable = $this->getKeyName();
-            $upd = $this->qb->update($this->table,$vars,array($variable=>$this->$variable))->getResult();
+
+            $variable = $this->key;                        
+
+            $upd = $this->qb->update($this->table,$vars,array($variable=>$this->$variable))->getResult();            
+
             if($upd){
+
                 $this->params = $vars;
+
                 $this->return["success"] = true;
             }else{
+
                 $this->return["success"] = false;
             }
         }

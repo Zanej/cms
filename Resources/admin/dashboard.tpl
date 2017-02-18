@@ -1,6 +1,8 @@
 {$idPage ="dashboard"}
 {$nomeSezione = "dashboard"}
 {$title ="dashboard"}
+{$pagina ="dashboard"}
+
 {extends file="./default.tpl"}
 {block name="right_side"}
     <div class="to_do_list">

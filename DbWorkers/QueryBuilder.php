@@ -145,11 +145,15 @@ class QueryBuilder {
         }
         if(is_array($where)){
             foreach($where as $key => $val){
-                if(substr($key,0,strlen("md5(")) == "md5("){                    
+
+                if(substr($key,0,strlen("md5(")) == "md5("){  
+
                     $this->builders->where.="md5(".$newalias.".".substr($key,strlen("md5("))." = '$val' AND ";
                 }elseif(substr($key,0,strlen("sha1(")) == "sha1("){
+
                     $this->builders->where.="sha1(".$newalias.".".substr($key,strlen("sha1("))." = '$val' AND ";
                 }else{
+
                     $this->builders->where.="$newalias.$key = '$val' AND ";
                 }
             }
@@ -165,9 +169,12 @@ class QueryBuilder {
      */
     private function setOn($old,$new,$table,$on){
         $join = " JOIN ".$table." AS ".$new." ON ";
+
         foreach($on as $key => $value){
+
             $join.="$old.$key = $new.$value AND ";
         }
+
         $join = substr($join,0,-5);
         $this->builders->join.=$join;
     }
@@ -179,7 +186,9 @@ class QueryBuilder {
     private function setParamsUpdate($alias,$fields){
         $this->builders->values.=",";
         if(is_array($fields)){
+
             foreach($fields as $key => $val){
+
                 $this->builders->values.="$alias.$key = '$val',";
             }
         }
@@ -193,12 +202,17 @@ class QueryBuilder {
     private function setParamsSelect($alias,$fields){
         $this->builders->values.=",";
         if(is_array($fields)){
+
             foreach($fields as $val){
+
                 if(!in_array($val,$this->fields_seen)){
+
                     $this->fields_seen[] = $val;
                 }else{
+
                     $val.=" as ".$val."_".$this->alias[$alias];
                 }
+
                 $this->builders->values.="$alias.$val,";
             }
         }
@@ -262,18 +276,27 @@ class QueryBuilder {
         }
     }
     private function joinQuery(){
+
         $this->query = $this->builders->action." ";
+
         if($this->builders->action == "SELECT"){
+
             $this->query.=$this->builders->values." FROM ".$this->builders->from.$this->builders->join;
+
             if($this->builders->where != ""){
+
                 $this->query.=" WHERE ".$this->builders->where;
             }
-            if($this->builders->limit != ""){                
+            if($this->builders->limit != ""){   
+
                 $this->query.=" LIMIT ".$this->builders->limit;
             }
         }elseif($this->builders->action == "UPDATE"){
+
             $this->query.=$this->builders->from.$this->builders->join." SET ".$this->builders->values;
+
             if($this->builders->where != ""){
+
                 $this->query.=" WHERE ".$this->builders->where;
             }
         }elseif($this->builders->action == "DELETE"){
@@ -290,9 +313,11 @@ class QueryBuilder {
             $this->setWhere($where);
         }
         if($this->builders->action == "INSERT"){
+
             $this->query = "INSERT INTO $table (".$this->builders->from.") VALUES(".$this->builders->values.")";
         }
         elseif($this->builders->action == "SELECT"){
+
             $this->builders->from.=" AS a";
             $this->query = "SELECT ".$this->builders->values." FROM ".$this->builders->from; 
             if($this->builders->where != ""){
@@ -303,19 +328,22 @@ class QueryBuilder {
             }
             ////echo $this->query;
         }elseif($this->builders->action == "DELETE"){
+
             if($this->builders->where != ""){
                 $this->query= "DELETE FROM ".$this->builders->from." WHERE ".$this->builders->where;
             }else{
                $this->query="TRUNCATE TABLE ".$this->builders->from; 
             }
         }elseif($this->builders->action == "UPDATE"){
+
             $this->builders->from.=" AS a";
             $this->query=" UPDATE ".$this->builders->from." SET ".$this->builders->values;
             if($this->builders->where != ""){
                 $this->query.=" WHERE ".$this->builders->where;
             }
         }
-        #echo $this->query;
+
+//        echo $this->query;
     }
     /**
      * 
@@ -325,13 +353,23 @@ class QueryBuilder {
         foreach($where as $key => $value){
             ////echo $key." ".$value;
             if($this->builders->action !== "DELETE"){
-                if(substr($key,0,strlen("md5(")) == "md5("){    
-                    $this->builders->where.="md5(a.".substr($key,strlen("md5("))." = '$value' AND ";
-                }elseif(substr($key,0,strlen("sha1(")) == "sha1("){
-                    $this->builders->where.="sha1(a.".substr($key,strlen("sha1("))." = '$value' AND ";
-                }else{                    
-                    $this->builders->where.="a.$key = '".$value."' AND ";
+
+                if(is_numeric($key)){
+
+                    $this->builders->where.="a.".$value." AND ";
+                }else{
+                    if(substr($key,0,strlen("md5(")) == "md5("){    
+
+                        $this->builders->where.="md5(a.".substr($key,strlen("md5("))." = '$value' AND ";
+                    }elseif(substr($key,0,strlen("sha1(")) == "sha1("){
+
+                        $this->builders->where.="sha1(a.".substr($key,strlen("sha1("))." = '$value' AND ";
+                    }else{                    
+
+                        $this->builders->where.="a.$key = '".$value."' AND ";
+                    }    
                 }
+                
             }else{
                 $this->builders->where.=$key." = '".$value."' AND ";
             }
@@ -346,17 +384,23 @@ class QueryBuilder {
     */
     public function getResult($cacheable = true){
         $db = Config::getDb();
-        if($this->builders->action == "INSERT"){
+        if($this->builders->action == "INSERT"){            
+
             $db->Query($this->query);
             $this->addToHistory(false, $db->Error() ? false : $db->GetLastInsertID(), $db->Error());
             return $db->Error() ? false : $db->GetLastInsertID();
         }elseif($this->builders->action == "DELETE"){
+
             $db->Query($this->query);
             $this->addToHistory(false, $db->Error() ? false : true, $db->Error());
             return !($db->Error());
-        }elseif($this->builders->action == "SELECT"){               
+        }elseif($this->builders->action == "SELECT"){  
+
+            #echo $this->query;
+            
             return $this->selectCached($cacheable);
         }elseif($this->builders->action == "UPDATE"){
+
             $res = $db->Query($this->query);
             self::$queryhistory[] = $this->addToHistory(false, $db->Error() ? false : true, $db->Error());
             return $res;
@@ -366,7 +410,10 @@ class QueryBuilder {
      * Gets a select result from cache if is cached, from db if it's not
      * @return array or false
      */
-    private function selectCached($cacheable = true){        
+    private function selectCached($cacheable = true){    
+
+        // echo $this->query;
+
         if($this->builders->limit != ""){
             $this->query.= " LIMIT ".$this->builders->limit;
         }        

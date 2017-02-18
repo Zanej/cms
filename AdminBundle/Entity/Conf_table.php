@@ -2,7 +2,8 @@
     namespace CMS\AdminBundle\Entity;
     use CMS\DbWorkers\AbstractDbElement; 
     use CMS\DbWorkers\Table;
-    class Conf_table extends AbstractDbElement{
+    
+    class Conf_table extends AbstractDbElement{    
         /**
          *@var int(11)
          *@key PRIMARY|PRIMARY KEY
@@ -225,98 +226,64 @@
         public function getViewLista(){
             return $this->view_lista;
         }
-
         /**
          * [checkCampi description]
          * @return [type] [description]
          */
         public function checkCampi(){
-
             if(!$this->table && ! $this->object){
-
                 return false;
             }
-
             if($this->table){
-
                 return $this->checkCampiTable();
             }else{
-
                 return $this->checkCampiObject();
             }
         }
-
         /**
          * [checkCampiObject description]
          * @return [type] [description]
          */
         public function checkCampiObject(){
-
             if(!$this->object){
-
                 return false;
             }
-
             if($this->where_object){
-
                 $where = $this->object_to_array(json_decode($this->where_object));
             }
-
             $ct = new $this->object();
-
             $find = $ct->findBy($where,false,"*");
-
             return $find;
         }
-
         /**
          * [checkCampiTable description]
          * @return [type] [description]
          */
         public function checkCampiTable(){
-
             if(!$this->table){
-
                 return false;
             }
-
             $ct = new Table($this->table,true,false);
-
-
             if($this->where){
-
                 $where = $this->where;
-
             }elseif($this->where_object){
-
                 $where = $this->object_to_array(json_decode($this->where_object));
             }
-
             $find = $ct->findBy($where,false,"*");
-            
             return $find;
         }
-
         /**
          * [object_to_array description]
          * @param  [type] $obj [description]
          * @return [type]      [description]
          */
         public function object_to_array($obj){
-
             print_r($obj);
-
             $vars = get_object_vars($obj);
-
             $ret = array();
-
             foreach($vars as $k => $v){
-
                 $ret[$k] = $v;
             }
-
             return $ret;
-
         }
-
     }

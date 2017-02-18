@@ -223,9 +223,12 @@
             return $this->livello;
         }
         public function initFields(){
+
             if($this->from){
-                $this->campi = $this->ct_controller->findBy(array("id_sezione"=>$this->getId(),$this->from=>1));                                
+
+                $this->campi = $this->ct_controller->findBy(array("id_sezione"=>$this->getId(),$this->from=>1));                
             }else{
+
                 $this->campi = $this->ct_controller->findBy(array("id_sezione"=>$this->getId()));                
             }            
             $chiave_titolo = false;
@@ -290,6 +293,9 @@
         public function getRows($type="",$filter="",$page=""){
             /*@var $controller_conf Conf_tableController*/            
             $campi_r = $this->getCampi($type);
+
+            // print_r($campi_r);
+            
             foreach($campi_r as $k => $v){
                 if(is_object($v)){
                     $campi[] = $v->get("field"); 
@@ -322,6 +328,12 @@
             }
             return $rows;
         }
+
+        /**
+         * [getEditLink description]
+         * @param  [type] $id_el [description]
+         * @return [type]        [description]
+         */
         public function getEditLink($id_el){
             if(is_object($id_el)){
                 $id = $id_el->getId();

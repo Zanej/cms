@@ -40,6 +40,13 @@
          */
         protected $type;
         /**
+         *@var enum('0','1')
+         *@default 1
+         *@extra 
+         *@nullable NO
+         */
+        protected $stato;
+        /**
          *@var varchar(255)
          *@default 
          *@extra 
@@ -61,6 +68,9 @@
         public function setType($type){
             $this->type=$type;
         }
+        public function setStato($stato){
+            $this->stato=$stato;
+        }
         public function setPage($page){
             $this->page=$page;
         }
@@ -78,6 +88,9 @@
         }
         public function getType(){
             return $this->type;
+        }
+        public function getStato(){
+            return $this->stato;
         }
         public function getPage(){
             return $this->page;

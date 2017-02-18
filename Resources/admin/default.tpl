@@ -5,23 +5,21 @@
         {/block}
     </head>
     <body id="{$idPage}" class="{$bodyClass}">
-        {block name="header"}
-            {include file="./header.tpl"}
-        {/block}
         <div class="contenitore">
-            <div class="left closed">
+            <div class="left open navbar left_col">
                 {block name="left_side"}
                     {include file="./left_side.tpl"}
                 {/block}
             </div><!--left-->
-            <div class="right open">
-                {block name="right_side"}
+            <div class="right">
+                {include file="./header.tpl"}
+                {block name="right_side"}                    
                     {include file="./right_side.tpl"}                    
                 {/block}
             </div><!--right-->
         </div><!--contenitore-->
         {block name="footer"}
-        
+            {include file="./footer.tpl"}
         {/block}
     </body>
 </html>

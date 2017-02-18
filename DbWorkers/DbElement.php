@@ -1,5 +1,6 @@
 <?php
     namespace CMS\DbWorkers;
+    use CMS\Conf\Config;
 	/**
 	 * Classe per gestire un elemento generico del db
 	 */
@@ -15,6 +16,12 @@
 		 */
 		function __construct($id=null,$params="*",$key_name=null,$table_name=null,$md5=false){
 			global $db;
+
+			if(!$db){
+
+				$db = Config::getDB();
+			}
+			
             $this->querybuilder = new QueryBuilder();
             //print_r($this->querybuilder);   
 			$this->return = array();
@@ -25,7 +32,7 @@
                $this->table = $table_name;
             }
 			$this->return["success"]=false;
-            $db = new MySQL(true, "test", "localhost", "root", "");
+            //$db = new MySQL(true, "test", "localhost", "root", "");
             //$db = new MySQL(true,DB_HOST,DB_NAME,DB_PASSWORD,DB_USER);
 			if($db->Error()){
 				$this->return["message"] = "Errore";
