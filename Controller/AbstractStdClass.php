@@ -14,16 +14,19 @@ namespace CMS\Controller;
  * @author zane2
  */
 class AbstractStdClass extends \stdClass{
+    
     function __construct($params){
         foreach($params as $k => $v){
             $this->$k = $v;
         }
     }
+
     function get($what){
         return $this->$what;
     }
-    function set($what){
-        $this->$what = $what;
+
+    function set($what, $how){
+        $this->$what = $how;
     }
     //put your code here
 }
